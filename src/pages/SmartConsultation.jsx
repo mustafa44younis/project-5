@@ -16,6 +16,7 @@ export default function SmartConsultation({ onNavigate }) {
   // 'expert' (الاستشارة مع خبير) أو 'ai' (الاستشارة الذكية)
   const [consultationType, setConsultationType] = useState('expert');
   const [inputValue, setInputValue] = useState('');
+  const [inputError, setInputError] = useState(false);
   
   // حالات مودال حجز الخبير البشري
   const [showExpertModal, setShowExpertModal] = useState(false);
@@ -37,11 +38,15 @@ export default function SmartConsultation({ onNavigate }) {
     if (consultationType === 'expert') {
       setShowExpertModal(true);
     } else {
-      const messageToSend = inputValue.trim() || `أريد استشارة بخصوص: الاستشارة الذكية`;
+      if (!inputValue.trim()) {
+        setInputError(true);
+        return;
+      }
+      setInputError(false);
       if (onNavigate) {
         onNavigate('smartConversation', {
           idea: 'الاستشارة الذكية',
-          message: messageToSend
+          message: inputValue.trim()
         });
       }
     }
@@ -103,10 +108,16 @@ export default function SmartConsultation({ onNavigate }) {
           <textarea 
             placeholder={consultationType === 'expert' ? "انقر هنا أو على زر الاستشارة أعلاه لفتح جدول الحجز مع الخبير..." : "أدخل فكرة مشروعك هنا..."}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => { setInputValue(e.target.value); if (inputError) setInputError(false); }}
             onKeyDown={handleKeyDown}
             rows={2}
+            style={inputError && consultationType === 'ai' ? { border: '1.5px solid #F04438', outline: 'none' } : {}}
           />
+          {inputError && consultationType === 'ai' && (
+            <p style={{ color: '#F04438', fontSize: '11.5px', fontWeight: '700', margin: '4px 0 0 0', textAlign: 'right' }}>
+              ⚠ الرجاء كتابة فكرة مشروعك قبل الإرسال
+            </p>
+          )}
           <div className="input-actions-bar">
             <div className="input-actions-right">
               <button type="button" className="attach-btn" title="إرفاق ملف">

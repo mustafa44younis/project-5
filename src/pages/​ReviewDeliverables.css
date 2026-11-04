@@ -487,3 +487,277 @@
   font-size: 10px;
   color: #475467;
 }
+
+
+/* ========================================================
+   أزرار التبديل السريع بين المشاريع في أعلى صفحة المراجعة
+   ======================================================== */
+.review-project-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 12px;
+  border: 1px solid #EAECF0;
+  margin-bottom: 20px;
+  width: fit-content;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+}
+
+.review-switcher-label {
+  font-size: 12px;
+  font-weight: 800;
+  color: #667085;
+  padding: 0 10px;
+}
+
+.proj-switch-btn {
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12.5px;
+  color: #475467;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.proj-switch-btn:hover {
+  background: #F9FAFB;
+  color: #181818;
+}
+
+.proj-switch-btn.active {
+  background: #14A800;
+  color: #ffffff;
+  border-color: #14A800;
+  box-shadow: 0 2px 6px rgba(20, 168, 0, 0.25);
+}
+
+/* ========================================================
+   معاينة متجر سلة الخير في الكانفاس
+   ======================================================== */
+.store-mockup-card {
+  background: #ffffff;
+  border: 1px solid #E4E7EC;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  text-align: right;
+  position: relative;
+}
+
+.store-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #F2F4F7;
+}
+
+.store-badge-organic {
+  background: #ECFDF3;
+  color: #027A48;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid #A6F4C5;
+}
+
+.store-card-body {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.store-img-box {
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #F4F3EF;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.store-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.store-item-info h4 {
+  font-size: 13.5px;
+  font-weight: 900;
+  color: #181818;
+  margin: 0 0 4px 0;
+}
+
+.store-item-info p {
+  font-size: 10.5px;
+  color: #667085;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.store-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.store-price {
+  font-size: 14px;
+  font-weight: 900;
+  color: #14A800;
+}
+
+.store-add-btn {
+  background: #14A800;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  position: relative;
+}
+
+.store-cart-bar {
+  background: #182211;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  margin-top: 10px;
+}
+
+/* ========================================================
+   معاينة تطبيق موعد في الكانفاس
+   ======================================================== */
+.mawid-mobile-card {
+  background: #ffffff;
+  border: 1px solid #EAF7E6;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(20, 168, 0, 0.08);
+  text-align: right;
+  position: relative;
+}
+
+.mawid-doc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F0FDF4;
+}
+
+.mawid-doc-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #EAF7E6;
+  color: #14A800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 15px;
+}
+
+.mawid-doc-info h4 {
+  font-size: 13px;
+  font-weight: 900;
+  color: #0F172A;
+  margin: 0;
+}
+
+.mawid-doc-info small {
+  font-size: 10.5px;
+  color: #14A800;
+  font-weight: 700;
+}
+
+.mawid-date-picker {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 800;
+  color: #334155;
+}
+
+.mawid-slots-label {
+  font-size: 11px;
+  font-weight: 800;
+  color: #475467;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.mawid-time-chips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.time-chip {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 6px;
+  padding: 6px 2px;
+  text-align: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #475467;
+}
+
+.time-chip.active {
+  background: #14A800;
+  color: #ffffff;
+  border-color: #14A800;
+  position: relative;
+  font-weight: 900;
+}
+
+.mawid-confirm-btn {
+  background: #14A800;
+  color: #ffffff;
+  border: none;
+  width: 100%;
+  padding: 8px;
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.mawid-confirm-btn:hover {
+  background: #118d00;
+}

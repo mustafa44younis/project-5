@@ -11,6 +11,7 @@ import LocalPhoneOutlinedIcon from '@mui/icons-material/LocalPhoneOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
@@ -84,13 +85,40 @@ function FormHeader({ title, desc, onClose }) {
   );
 }
 
-function Field({ label, placeholder, type = "text", icon, error, hint }) {
+function Field({ 
+  label, 
+  placeholder, 
+  type = "text", 
+  icon, 
+  error, 
+  hint, 
+  value = "", 
+  onChange, 
+  showPassword, 
+  onTogglePassword 
+}) {
   return (
     <>
       {label && <label>{label}</label>}
       <div className={"field" + (error ? " error" : "")}>
-        {icon === "eye"   && <button type="button" className="icon" tabIndex="-1"><VisibilityOutlinedIcon sx={{ fontSize: 18 }} /></button>}
-        <input type={type} placeholder={placeholder} />
+        {icon === "eye" && (
+          <button 
+            type="button" 
+            className="icon" 
+            tabIndex="-1" 
+            onClick={onTogglePassword}
+            style={{ cursor: 'pointer', background: 'none', border: 'none', display: 'flex', alignItems: 'center' }}
+            title={showPassword ? "إخفاء كلمة المرور" : "عرض كلمة المرور"}
+          >
+            {showPassword ? <VisibilityOffOutlinedIcon sx={{ fontSize: 18 }} /> : <VisibilityOutlinedIcon sx={{ fontSize: 18 }} />}
+          </button>
+        )}
+        <input 
+          type={type} 
+          placeholder={placeholder} 
+          value={value}
+          onChange={onChange}
+        />
         {icon === "mail"  && <span className="icon"><MailOutlineRoundedIcon sx={{ fontSize: 18 }} /></span>}
         {icon === "phone" && <span className="icon"><LocalPhoneOutlinedIcon sx={{ fontSize: 18 }} /></span>}
         {icon === "lock"  && <span className="icon"><LockOutlinedIcon sx={{ fontSize: 18 }} /></span>}
@@ -140,10 +168,28 @@ function SignupScreen({ onSignup, go, onClose }) {
   const [role, setRole] = useState(0);
   const roles = ["صاحب عمل / عميل", "قائد فريق", "مستقل محترف"];
 
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!fullName.trim()) newErrors.fullName = "يرجى كتابة الاسم الكامل";
+    if (!email.trim()) newErrors.email = "يرجى كتابة البريد الإلكتروني";
+    if (!phone.trim()) newErrors.phone = "يرجى كتابة رقم الهاتف";
+    if (!password.trim()) newErrors.password = "يرجى كتابة كلمة المرور";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return;
     if (onSignup) {
-      onSignup();
+      onSignup(email);
     } else {
       go("success");
     }
@@ -157,11 +203,58 @@ function SignupScreen({ onSignup, go, onClose }) {
           <div key={r} className={i === role ? "on" : ""} onClick={() => setRole(i)}>{r}</div>
         ))}
       </div>
-      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-        <Field label="الاسم الكامل" placeholder="سارة أحمد" icon="user" />
-        <Field label="البريد الإلكتروني" placeholder="name@company.com" icon="mail" />
-        <Field label="رقم الهاتف" placeholder="+966 55 123 4567" icon="phone" />
-        <Field label="كلمة المرور" type="password" placeholder="••••••••" icon="lock" hint="قوة كلمة المرور: قوية جداً" />
+      <form onSubmit={handleSubmit} style={{ width: '100%' }} noValidate>
+        <Field 
+          label="الاسم الكامل" 
+          placeholder="سارة أحمد" 
+          icon="user" 
+          value={fullName}
+          onChange={(e) => {
+            setFullName(e.target.value);
+            if (errors.fullName) setErrors(prev => ({ ...prev, fullName: null }));
+          }}
+          error={!!errors.fullName}
+          hint={errors.fullName}
+        />
+        <Field 
+          label="البريد الإلكتروني" 
+          placeholder="name@gmail.com" 
+          icon="mail" 
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (errors.email) setErrors(prev => ({ ...prev, email: null }));
+          }}
+          error={!!errors.email}
+          hint={errors.email}
+        />
+        <Field 
+          label="رقم الهاتف" 
+          placeholder="+966 55 123 4567" 
+          icon="phone" 
+          value={phone}
+          onChange={(e) => {
+            setPhone(e.target.value);
+            if (errors.phone) setErrors(prev => ({ ...prev, phone: null }));
+          }}
+          error={!!errors.phone}
+          hint={errors.phone}
+        />
+        <Field 
+          label="كلمة المرور" 
+          type={showPassword ? "text" : "password"} 
+          placeholder="••••••••" 
+          icon="eye" 
+          showPassword={showPassword}
+          onTogglePassword={() => setShowPassword(!showPassword)}
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (errors.password) setErrors(prev => ({ ...prev, password: null }));
+          }}
+          error={!!errors.password}
+          hint={errors.password || (password.length >= 6 ? "قوة كلمة المرور: قوية جداً" : null)}
+        />
         <Checkbox>أوافق على الشروط وسياسة الخصوصية</Checkbox>
         <button type="submit" className="btn">إنشاء حساب جديد</button>
       </form>
@@ -170,11 +263,38 @@ function SignupScreen({ onSignup, go, onClose }) {
   );
 }
 
-function LoginScreen({ onLogin, go, withError, onClose }) {
+function LoginScreen({ onLogin, go, onClose }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+
+  // التحقق الإلزامي من تعبئة الحقول قبل الدخول
+  const validate = () => {
+    const newErrors = {};
+
+    if (!email.trim()) {
+      newErrors.email = "يرجى كتابة البريد الإلكتروني أو اسم المستخدم";
+    }
+
+    if (!password.trim()) {
+      newErrors.password = "يرجى كتابة كلمة المرور للمتابعة";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // إذا كانت الحقول فارغة يتم إيقاف الإرسال وإظهار رسائل الخطأ الحمراء
+    if (!validate()) {
+      return;
+    }
+
     if (onLogin) {
-      onLogin();
+      onLogin(email);
     } else {
       go("success");
     }
@@ -183,12 +303,39 @@ function LoginScreen({ onLogin, go, withError, onClose }) {
   return (
     <div className="form-side">
       <FormHeader title="مرحباً بعودتك" desc="سجّل دخولك وأكمل رحلة إنجازك" onClose={onClose} />
-      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-        {withError
-          ? <Field label="البريد الإلكتروني" placeholder="name@company.com" icon="mail" error hint="البريد الإلكتروني أو كلمة المرور غير صحيحة" />
-          : <Field label="البريد الإلكتروني" placeholder="name@company.com" icon="mail" />}
-        <Field label="كلمة المرور" type="password" placeholder="••••••••" icon={withError ? "lock" : "eye"} error={withError} />
-        <Checkbox>{withError ? "تذكرني" : "تسجيل الدخول تلقائياً"}</Checkbox>
+      <form onSubmit={handleSubmit} style={{ width: '100%' }} noValidate>
+        <Field 
+          label="البريد الإلكتروني" 
+          placeholder="name@gmail.com" 
+          icon="mail" 
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            if (errors.email) {
+              setErrors(prev => ({ ...prev, email: null }));
+            }
+          }}
+          error={!!errors.email} 
+          hint={errors.email} 
+        />
+        <Field 
+          label="كلمة المرور" 
+          type={showPassword ? "text" : "password"} 
+          placeholder="••••••••" 
+          icon="eye" 
+          showPassword={showPassword}
+          onTogglePassword={() => setShowPassword(!showPassword)}
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            if (errors.password) {
+              setErrors(prev => ({ ...prev, password: null }));
+            }
+          }}
+          error={!!errors.password}
+          hint={errors.password} 
+        />
+        <Checkbox>تسجيل الدخول تلقائياً</Checkbox>
         <button type="submit" className="btn">تسجيل الدخول</button>
         <button type="button" className="btn ghost" onClick={() => go("reset")}>إعادة تعيين كلمة المرور</button>
       </form>
@@ -199,8 +346,22 @@ function LoginScreen({ onLogin, go, withError, onClose }) {
 }
 
 function ResetScreen({ onReset, go, onClose }) {
+  const [newPass, setNewPass] = useState("");
+  const [confirmPass, setConfirmPass] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!newPass.trim()) newErrors.newPass = "يرجى كتابة كلمة المرور الجديدة";
+    if (!confirmPass.trim()) newErrors.confirmPass = "يرجى تأكيد كلمة المرور الجديدة";
+    else if (newPass !== confirmPass) newErrors.confirmPass = "كلمات المرور غير متطابقة";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!validate()) return;
     if (onReset) {
       onReset();
     } else {
@@ -211,9 +372,33 @@ function ResetScreen({ onReset, go, onClose }) {
   return (
     <div className="form-side">
       <FormHeader title="إعادة تعيين كلمة المرور" desc="أدخل كلمة المرور الجديدة لحسابك لتأكيد التغيير والبدء فوراً" onClose={onClose} />
-      <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-        <Field label="كلمة المرور الجديدة" type="password" placeholder="••••••••" icon="eye" />
-        <Field label="تأكيد كلمة المرور الجديدة" type="password" placeholder="••••••••" icon="eye" />
+      <form onSubmit={handleSubmit} style={{ width: '100%' }} noValidate>
+        <Field 
+          label="كلمة المرور الجديدة" 
+          type="password" 
+          placeholder="••••••••" 
+          icon="lock" 
+          value={newPass}
+          onChange={(e) => {
+            setNewPass(e.target.value);
+            if (errors.newPass) setErrors(prev => ({ ...prev, newPass: null }));
+          }}
+          error={!!errors.newPass}
+          hint={errors.newPass}
+        />
+        <Field 
+          label="تأكيد كلمة المرور الجديدة" 
+          type="password" 
+          placeholder="••••••••" 
+          icon="lock" 
+          value={confirmPass}
+          onChange={(e) => {
+            setConfirmPass(e.target.value);
+            if (errors.confirmPass) setErrors(prev => ({ ...prev, confirmPass: null }));
+          }}
+          error={!!errors.confirmPass}
+          hint={errors.confirmPass}
+        />
         <button type="submit" className="btn" style={{ marginTop: 22 }}>حفظ كلمة المرور الجديدة</button>
         <button type="button" className="btn ghost" onClick={() => go("login")}>
           <ArrowForwardRoundedIcon sx={{ fontSize: 16, verticalAlign: 'middle', ml: 0.5 }} /> العودة لتسجيل الدخول
@@ -223,7 +408,7 @@ function ResetScreen({ onReset, go, onClose }) {
   );
 }
 
-function SuccessScreen({ onComplete, onClose }) {
+function SuccessScreen({ onComplete, onClose, userEmail }) {
   const [pct, setPct] = useState(0);
 
   useEffect(() => {
@@ -239,7 +424,7 @@ function SuccessScreen({ onComplete, onClose }) {
 
     const redirectTimer = setTimeout(() => {
       onComplete();
-    }, 500);
+    }, 600);
 
     return () => {
       clearInterval(timer);
@@ -262,7 +447,7 @@ function SuccessScreen({ onComplete, onClose }) {
         <h2 style={{ marginTop: 22 }}>مرحباً بعودتك! جاري نقلك إلى لوحة التحكم…</h2>
         <div className="details">
           تم تسجيل دخولك بنجاح. مباشرة يمكنك متابعة مشاريعك وفرقك بامتيازات كاملة<br />
-          <b>name@company.com</b> — متصل بحسابك الشخصي
+          <b>{userEmail || "name@company.com"}</b> — متصل بحسابك الشخصي
         </div>
         <div className="progress-wrap">
           <div className="progress-lbl"><span>جاري التحويل…</span><span>{pct}%</span></div>
@@ -283,12 +468,14 @@ function SuccessScreen({ onComplete, onClose }) {
 
 export default function Login({ initialScreen = "login", onNavigate }) {
   const [authScreen, setAuthScreen] = useState(initialScreen);
+  const [loggedInEmail, setLoggedInEmail] = useState("");
 
   useEffect(() => {
     setAuthScreen(initialScreen);
   }, [initialScreen]);
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (email) => {
+    if (email) setLoggedInEmail(email);
     setAuthScreen("success");
   };
 
@@ -314,6 +501,7 @@ export default function Login({ initialScreen = "login", onNavigate }) {
     if (authScreen === "success") {
       return (
         <SuccessScreen 
+          userEmail={loggedInEmail}
           onComplete={() => onNavigate("dashboard")} 
           onClose={() => onNavigate("home")} 
         />
@@ -323,7 +511,6 @@ export default function Login({ initialScreen = "login", onNavigate }) {
       <LoginScreen 
         onLogin={handleLoginSuccess} 
         go={(s) => setAuthScreen(s)} 
-        withError={false} 
         onClose={() => onNavigate("home")} 
       />
     );

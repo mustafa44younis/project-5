@@ -153,7 +153,11 @@ export default function Overview({ onNavigate }) {
             </thead>
             <tbody>
               {activeProjects.map((p) => (
-                <tr key={p.id} onClick={() => onNavigate(p.status === 'بانتظار المراجعة' ? 'review-deliverables' : 'project-details')} style={{ cursor: 'pointer' }}>
+                <tr 
+                  key={p.id} 
+                  onClick={() => onNavigate(p.status === 'بانتظار المراجعة' ? 'review-deliverables' : 'project-details', { id: p.id, title: p.name, name: p.name, leader: p.leader, ...p })} 
+                  style={{ cursor: 'pointer' }}
+                >
                   <td>
                     <div className="p-cell-title">
                       <span className="p-icon">{p.icon}</span>
@@ -204,7 +208,7 @@ export default function Overview({ onNavigate }) {
           <div className="ra-text">
             <span><LightbulbOutlinedIcon sx={{ fontSize: 18, verticalAlign: 'middle', ml: 0.5, color: '#14A800' }} /> دليل هوية نواة جاهز لاعتمادك. مراجعتك تساعد الفريق على التقدم.</span>
           </div>
-          <button className="btn-ra-action" onClick={() => onNavigate('review-deliverables')}>
+          <button className="btn-ra-action" onClick={() => onNavigate('review-deliverables', { id: 2, title: 'هوية نواة', fullTitle: 'هوية نواة - تصميم الهوية البصرية', code: 'AC-023', leader: 'سارة القحطاني' })}>
             مراجعة المخرجات
           </button>
         </div>

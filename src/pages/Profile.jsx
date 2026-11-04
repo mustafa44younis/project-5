@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import TopHeader from '../components/TopHeader';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -43,7 +43,9 @@ export default function Profile({ userName = "عبدالله العتيبي", us
   const [showModal, setShowModal] = useState(null); // 'avatar', '2fa', 'identity-verify', 'devices'
   const [tfaStep, setTfaStep] = useState(1); // 1: QR, 2: Verify Code, 3: Backup Codes
   const [verificationCode, setVerificationCode] = useState(['', '', '', '', '', '']);
+  const [otpError, setOtpError] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const otpRefs = useRef([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -343,18 +345,79 @@ export default function Profile({ userName = "عبدالله العتيبي", us
             {tfaStep === 2 && (
               <div className="tfa-step-content">
                 <p>أدخل رمز التحقق المكون من 6 أرقام الظاهر في هاتفك.</p>
-                <div className="otp-inputs-row">
+                <div className="otp-inputs-row" dir="ltr">
                   {verificationCode.map((digit, i) => (
-                    <input key={i} type="text" maxLength={1} value={digit} onChange={(e) => {
-                      const newCode = [...verificationCode];
-                      newCode[i] = e.target.value;
-                      setVerificationCode(newCode);
-                    }} />
+                    <input
+                      key={i}
+                      ref={(el) => (otpRefs.current[i] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={1}
+                      value={digit}
+                      style={otpError && !digit ? { borderColor: '#F04438', backgroundColor: '#FFF5F5' } : {}}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/[^0-9]/g, '');
+                        const newCode = [...verificationCode];
+                        newCode[i] = val ? val.slice(-1) : '';
+                        setVerificationCode(newCode);
+                        if (otpError) setOtpError(false);
+
+                        // الانتقال للخانة التالية تلقائياً عند كتابة رقم
+                        if (val && i < 5 && otpRefs.current[i + 1]) {
+                          otpRefs.current[i + 1].focus();
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        // الرجوع للخانة السابقة عند الحذف
+                        if (e.key === 'Backspace') {
+                          if (!verificationCode[i] && i > 0 && otpRefs.current[i - 1]) {
+                            otpRefs.current[i - 1].focus();
+                          }
+                        }
+                      }}
+                      onPaste={(e) => {
+                        // دعم اللصق المباشر لرمز الـ 6 أرقام
+                        e.preventDefault();
+                        const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+                        if (pasted) {
+                          const newCode = [...verificationCode];
+                          pasted.split('').forEach((ch, idx) => { newCode[idx] = ch; });
+                          setVerificationCode(newCode);
+                          if (otpError) setOtpError(false);
+                          const nextIdx = Math.min(pasted.length, 5);
+                          if (otpRefs.current[nextIdx]) otpRefs.current[nextIdx].focus();
+                        }
+                      }}
+                    />
                   ))}
                 </div>
+                {otpError && (
+                  <p style={{ color: '#F04438', fontSize: '11.5px', fontWeight: '700', textAlign: 'center', margin: '-15px 0 20px 0' }}>
+                    ⚠ يرجى إدخال كامل رمز التحقق (6 أرقام) للمتابعة
+                  </p>
+                )}
                 <div className="modal-footer-actions">
-                  <button type="button" className="btn-cancel" onClick={() => setTfaStep(1)}>السابق</button>
-                  <button type="button" className="btn-save" onClick={() => setTfaStep(3)}>التحقق والمتابعة</button>
+                  <button type="button" className="btn-cancel" onClick={() => { setTfaStep(1); setOtpError(false); }}>السابق</button>
+                  <button 
+                    type="button" 
+                    className="btn-save" 
+                    onClick={() => {
+                      const isComplete = verificationCode.every(d => d.trim() !== '');
+                      if (!isComplete) {
+                        setOtpError(true);
+                        // Focus the first empty field
+                        const firstEmptyIdx = verificationCode.findIndex(d => d.trim() === '');
+                        if (firstEmptyIdx !== -1 && otpRefs.current[firstEmptyIdx]) {
+                          otpRefs.current[firstEmptyIdx].focus();
+                        }
+                        return;
+                      }
+                      setOtpError(false);
+                      setTfaStep(3);
+                    }}
+                  >
+                    التحقق والمتابعة
+                  </button>
                 </div>
               </div>
             )}

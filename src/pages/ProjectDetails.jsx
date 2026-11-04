@@ -11,7 +11,7 @@ import NorthWestRoundedIcon from '@mui/icons-material/NorthWestRounded';
 import './ProjectDetails.css';
 
 export default function ProjectDetails({ onNavigate, projectData }) {
-  // استخدام بيانات المشروع المُمررة أو الافتراضية "هوية نواة" المطابقة للصورة 2
+  // استخدام بيانات المشروع المُمررة أو الافتراضية "هوية نواة"
   const project = projectData || {
     id: 2,
     title: 'هوية نواة',
@@ -25,6 +25,87 @@ export default function ProjectDetails({ onNavigate, projectData }) {
     leader: 'سارة القحطاني',
     leaderRole: 'قائد الفريق • مصممة هوية'
   };
+
+  const isSallet = (project.title || '').includes('سلة') || (project.leader || '').includes('أحمد');
+  const isMawid = (project.title || '').includes('موعد') || (project.leader || '').includes('خالد');
+
+  const leaderName = isSallet ? 'أحمد السالم' : isMawid ? 'خالد الحربي' : (project.leader ? project.leader.replace('قائد المشروع: ', '').replace('قائد الفريق: ', '') : 'سارة القحطاني');
+  const leaderRole = isSallet ? 'قائد المشروع • مصمم واجهات' : isMawid ? 'قائد المشروع • مطور تطبيقات' : 'قائد الفريق • مصممة هوية';
+  
+  // صور شخصية متطابقة بدقة مع الاسم والجنس (رجل لأحمد وخالد، امرأة لسارة)
+  const leaderImg = isSallet
+    ? 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100' // صورة أحمد السالم (رجل مهني)
+    : isMawid
+    ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100' // صورة خالد الحربي (رجل مهني)
+    : 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'; // صورة سارة القحطاني (امرأة مهنية)
+
+  const teamMembers = isSallet ? [
+    {
+      name: 'أحمد السالم',
+      role: 'قائد المشروع • مصمم واجهات',
+      img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', // رجل
+      status: '● متاح الآن'
+    },
+    {
+      name: 'نورة الدوسري',
+      role: 'مطورة واجهات أمامية',
+      img: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100', // امرأة
+      status: '● تعمل على المتجر'
+    },
+    {
+      name: 'سعود المطيري',
+      role: 'مختص تجربة الشراء والتسوق',
+      img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', // رجل
+      status: '● متاح الآن'
+    }
+  ] : isMawid ? [
+    {
+      name: 'خالد الحربي',
+      role: 'قائد المشروع • مطور تطبيقات',
+      img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100', // رجل
+      status: '● متاح الآن'
+    },
+    {
+      name: 'منى الغامدي',
+      role: 'مصممة واجهات وتجربة المستخدم UI/UX',
+      img: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100', // امرأة
+      status: '● تعمل على الشاشات'
+    },
+    {
+      name: 'طارق الزهراني',
+      role: 'مهندس تكامل الأنظمة والتقويم',
+      img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100', // رجل
+      status: '● متاح الآن'
+    }
+  ] : [
+    {
+      name: 'سارة القحطاني',
+      role: 'قائد الفريق • مصممة هوية',
+      img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100', // امرأة
+      status: '● متاحة الآن'
+    },
+    {
+      name: 'هند الشمري',
+      role: 'مصممة تايبوغرافي ومطبوعات',
+      img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100', // امرأة
+      status: '● تعمل على الدليل'
+    },
+    {
+      name: 'عبدالرحمن الشهري',
+      role: 'مختص علامات تجارية',
+      img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100', // رجل
+      status: '● متاح الآن'
+    }
+  ];
+
+  const projectIconChar = isSallet ? 'س' : isMawid ? 'م' : 'ن';
+  const projectIconBg = isSallet ? '#14A800' : isMawid ? '#0BA5EC' : '#1E392A';
+
+  const stage1Title = isSallet ? 'دراسة المتطلبات وتجربة المتسوق' : isMawid ? 'بناء رحلة المستخدم وهندسة الشاشات' : 'جلسة الاستكشاف وبناء المود بورد';
+  const stage2Title = isSallet ? 'تصميم الهيكل والتنقل في المتجر' : isMawid ? 'تصميم الشاشات التفاعلية الأولية' : 'تصميم مفاهيم الشعار المبدئية';
+  const stage3Title = isSallet ? 'تطوير وتصميم واجهات المتجر' : isMawid ? 'تصميم شاشات وتدفق حجز المواعيد' : 'تطوير دليل الهوية البصرية';
+  const stage3Sub = isSallet ? '20 أكتوبر - 18 صفحة مرفقة' : isMawid ? '14 أكتوبر - 16 شاشة مرفقة' : '16 أكتوبر - 3 ملفات مرفقة';
+  const stage4Title = isSallet ? 'تسليم الواجهات البرمجية للمتجر' : isMawid ? 'تسليم ملفات Figma والتصميم التفاعلي' : 'التسليم النهائي وحزمة الملفات المصدرية';
 
   return (
     <div className="project-details-page" dir="rtl">
@@ -57,8 +138,8 @@ export default function ProjectDetails({ onNavigate, projectData }) {
       <div className="pd-main-card">
         <div className="pd-main-top">
           <div className="pd-title-group">
-            <div className="pd-project-icon" style={{ background: '#1E392A', color: '#ffffff', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', fontSize: '20px' }}>
-              ن
+            <div className="pd-project-icon" style={{ background: projectIconBg, color: '#ffffff', width: '48px', height: '48px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '800', fontSize: '20px' }}>
+              {projectIconChar}
             </div>
             <div>
               <h2 style={{ fontSize: '18px', fontWeight: '800', color: '#181818', margin: '0 0 4px 0' }}>
@@ -114,12 +195,12 @@ export default function ProjectDetails({ onNavigate, projectData }) {
             <span className="lbl">قائد الفريق</span>
             <div className="leader-box" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
               <img 
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" 
-                alt="سارة القحطاني" 
+                src={leaderImg} 
+                alt={leaderName} 
                 style={{ width: '34px', height: '34px', borderRadius: '50%', objectFit: 'cover' }}
               />
               <strong style={{ fontSize: '13px', fontWeight: '800', color: '#181818' }}>
-                {project.leader || 'سارة القحطاني'}
+                {leaderName}
               </strong>
             </div>
           </div>
@@ -160,7 +241,7 @@ export default function ProjectDetails({ onNavigate, projectData }) {
                 <CheckCircleRoundedIcon sx={{ fontSize: 18, color: '#14A800' }} />
               </span>
             </div>
-            <h4>جلسة الاستكشاف وبناء المود بورد</h4>
+            <h4>{stage1Title}</h4>
             <p className="m-sub">تم الاعتماد في 04 أكتوبر</p>
             <button className="m-link-text">
               عرض المخرجات <NorthWestRoundedIcon sx={{ fontSize: 13, mr: 0.5 }} />
@@ -175,7 +256,7 @@ export default function ProjectDetails({ onNavigate, projectData }) {
                 <CheckCircleRoundedIcon sx={{ fontSize: 18, color: '#14A800' }} />
               </span>
             </div>
-            <h4>تصميم مفاهيم الشعار المبدئية</h4>
+            <h4>{stage2Title}</h4>
             <p className="m-sub">تم الاعتماد في 10 أكتوبر</p>
             <button className="m-link-text">
               عرض المخرجات <NorthWestRoundedIcon sx={{ fontSize: 13, mr: 0.5 }} />
@@ -196,8 +277,8 @@ export default function ProjectDetails({ onNavigate, projectData }) {
                 $
               </span>
             </div>
-            <h4>تطوير دليل الهوية البصرية</h4>
-            <p className="m-sub">16 أكتوبر - 3 ملفات مرفقة</p>
+            <h4>{stage3Title}</h4>
+            <p className="m-sub">{stage3Sub}</p>
             <button 
               className="btn-m-action" 
               onClick={(e) => { e.stopPropagation(); onNavigate('review-deliverables', project); }}
@@ -215,7 +296,7 @@ export default function ProjectDetails({ onNavigate, projectData }) {
                 <LockOutlinedIcon sx={{ fontSize: 16, color: '#98A2B3' }} />
               </span>
             </div>
-            <h4>التسليم النهائي وحزمة الملفات المصدرية</h4>
+            <h4>{stage4Title}</h4>
             <p className="m-sub">18 أكتوبر، الحزمة النهائية</p>
             <span className="locked-text" style={{ fontSize: '11.5px', color: '#98A2B3', display: 'block', marginTop: '12px' }}>
               تُفتح بعد الاعتماد
@@ -233,30 +314,24 @@ export default function ProjectDetails({ onNavigate, projectData }) {
             <span style={{ fontSize: '12px', color: '#667085' }}>3 أعضاء</span>
           </div>
           <div className="team-members-list">
-            <div className="team-member-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', borderBottom: '1px solid #F2F4F7' }}>
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="سارة" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
-              <div>
-                <strong style={{ fontSize: '13px', display: 'block', color: '#181818' }}>سارة القحطاني</strong>
-                <small style={{ fontSize: '11px', color: '#667085' }}>قائد الفريق • مصممة هوية</small>
+            {teamMembers.map((m, idx) => (
+              <div 
+                key={idx} 
+                className="team-member-item" 
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', borderBottom: idx < teamMembers.length - 1 ? '1px solid #F2F4F7' : 'none' }}
+              >
+                <img 
+                  src={m.img} 
+                  alt={m.name} 
+                  style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} 
+                />
+                <div>
+                  <strong style={{ fontSize: '13px', display: 'block', color: '#181818' }}>{m.name}</strong>
+                  <small style={{ fontSize: '11px', color: '#667085' }}>{m.role}</small>
+                </div>
+                <span style={{ marginRight: 'auto', fontSize: '10px', color: '#14A800' }}>{m.status}</span>
               </div>
-              <span style={{ marginRight: 'auto', fontSize: '10px', color: '#14A800' }}>● متاحة الآن</span>
-            </div>
-            <div className="team-member-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0', borderBottom: '1px solid #F2F4F7' }}>
-              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" alt="نورة" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
-              <div>
-                <strong style={{ fontSize: '13px', display: 'block', color: '#181818' }}>نورة العتيبي</strong>
-                <small style={{ fontSize: '11px', color: '#667085' }}>مصممة جرافيك</small>
-              </div>
-              <span style={{ marginRight: 'auto', fontSize: '10px', color: '#14A800' }}>● تعمل على المشروع</span>
-            </div>
-            <div className="team-member-item" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 0' }}>
-              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100" alt="خالد" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }} />
-              <div>
-                <strong style={{ fontSize: '13px', display: 'block', color: '#181818' }}>خالد الحربي</strong>
-                <small style={{ fontSize: '11px', color: '#667085' }}>مطور واجهات</small>
-              </div>
-              <span style={{ marginRight: 'auto', fontSize: '10px', color: '#14A800' }}>● متاح الآن</span>
-            </div>
+            ))}
           </div>
         </div>
 

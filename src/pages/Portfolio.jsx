@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import logoImage from '../images/Aaa.png';
-import kkkImage from '../images/kkkk.jpeg';
+import madarImage from '../images/mmm.jpeg';
 import './Portfolio.css';
 import Header from '../components/Header';
 
@@ -29,7 +29,7 @@ export default function Portfolio({ onNavigate, onLogin, onRegister }) {
       desc: "تجربة مستخدم ولوحة تحكم متكاملة للمؤسسات.",
       linkText: "تجربة المنصة ↗",
       status: "مكتمل",
-      img:kkkImage
+      img: madarImage
      
     },
     {

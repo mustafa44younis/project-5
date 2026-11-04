@@ -24,12 +24,13 @@ import PersonOutlineRoundedIcon from '@mui/icons-material/PersonOutlineRounded';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HeadsetMicRoundedIcon from '@mui/icons-material/HeadsetMicRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 
-export default function ClientLayout({ 
-  initialTab = 'dashboard', 
-  subView = 'consultation', 
-  onLogout, 
-  onNavigate 
+export default function ClientLayout({
+  initialTab = 'dashboard',
+  subView = 'consultation',
+  onLogout,
+  onNavigate
 }) {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [consultationSubView, setConsultationSubView] = useState(subView || 'consultation');
@@ -60,8 +61,8 @@ export default function ClientLayout({
       setConsultationSubView('consultation');
       if (data) setConsultationData(data);
     } else if (
-      target === 'project-details' || 
-      target === 'projectDetails' || 
+      target === 'project-details' ||
+      target === 'projectDetails' ||
       target === 'ProjectDetails'
     ) {
       setActiveTab('project-details');
@@ -98,61 +99,62 @@ export default function ClientLayout({
     <div className="client-layout" dir="rtl">
       {/* القائمة الجانبية الثابتة على اليمين */}
       <aside className="client-sidebar-right">
-        <div 
-          className="dash-brand-box" 
-          onClick={() => handleNavigation('home')} 
+        <div
+          className="dash-brand-box"
+          onClick={() => handleNavigation('home')}
           style={{ cursor: 'pointer' }}
           title="العودة للرئيسية"
         >
           <img src={logoimage} alt="ACCESS Logo" className="sidebar-logo-image" />
           <span className="dash-role-subtitle">مساحة العميل</span>
+
         </div>
 
         <nav className="dash-menu-list">
-          <button 
-            className={activeTab === 'dashboard' ? 'active' : ''} 
+          <button
+            className={activeTab === 'dashboard' ? 'active' : ''}
             onClick={() => handleNavigation('dashboard')}
           >
             <span className="menu-icon"><DashboardRoundedIcon fontSize="small" /></span> لوحة التحكم
           </button>
-          
-          <button 
-            className={(activeTab === 'projects' || activeTab === 'project-details' || activeTab === 'review-deliverables' || activeTab === 'final-delivery') ? 'active' : ''} 
+
+          <button
+            className={(activeTab === 'projects' || activeTab === 'project-details' || activeTab === 'review-deliverables' || activeTab === 'final-delivery') ? 'active' : ''}
             onClick={() => handleNavigation('projects')}
           >
             <span className="menu-icon"><FolderRoundedIcon fontSize="small" /></span> مشاريعي <span className="badge-num">3</span>
           </button>
-          
-          <button 
-            className={activeTab === 'ai' ? 'active' : ''} 
+
+          <button
+            className={activeTab === 'ai' ? 'active' : ''}
             onClick={() => handleNavigation('ai')}
           >
             <span className="menu-icon"><SmartToyRoundedIcon fontSize="small" /></span> الاستشارة
           </button>
-          
-          <button 
-            className={activeTab === 'wallet' ? 'active' : ''} 
+
+          <button
+            className={activeTab === 'wallet' ? 'active' : ''}
             onClick={() => handleNavigation('wallet')}
           >
             <span className="menu-icon"><AccountBalanceWalletRoundedIcon fontSize="small" /></span> المحفظة المالية
           </button>
-          
-          <button 
-            className={activeTab === 'messages' ? 'active' : ''} 
+
+          <button
+            className={activeTab === 'messages' ? 'active' : ''}
             onClick={() => handleNavigation('messages')}
           >
             <span className="menu-icon"><ChatBubbleOutlineRoundedIcon fontSize="small" /></span> الرسائل <span className="badge-num">2</span>
           </button>
-          
-          <button 
-            className={activeTab === 'profile' ? 'active' : ''} 
+
+          <button
+            className={activeTab === 'profile' ? 'active' : ''}
             onClick={() => handleNavigation('profile')}
           >
             <span className="menu-icon"><PersonOutlineRoundedIcon fontSize="small" /></span> الملف الشخصي
           </button>
-          
-          <button 
-            className={activeTab === 'settings' ? 'active' : ''} 
+
+          <button
+            className={activeTab === 'settings' ? 'active' : ''}
             onClick={() => handleNavigation('settings')}
           >
             <span className="menu-icon"><SettingsOutlinedIcon fontSize="small" /></span> الإعدادات
@@ -166,18 +168,22 @@ export default function ClientLayout({
           <button className="btn-outline-green" onClick={() => handleNavigation('messages')}>تواصل معنا</button>
         </div>
 
-        <div 
-          className="dash-user-bottom-box"
-          onClick={() => handleNavigation('profile')}
-          style={{ cursor: 'pointer' }}
-          title="الملف الشخصي"
-        >
-          <div className="user-avatar-circle">ع ع</div>
-          <div className="user-meta-text">
-            <strong>عبدالله العتيبي</strong>
-            <small>حساب عميل</small>
+        <div className="dash-user-bottom-box">
+          <div
+            className="user-info-row"
+            onClick={() => handleNavigation('profile')}
+            style={{ cursor: 'pointer' }}
+            title="الملف الشخصي"
+          >
           </div>
-          <span className="arrow-left"><ChevronLeftRoundedIcon fontSize="small" /></span>
+          <button
+            className="btn-logout"
+            onClick={() => handleNavigation('logout')}
+            title="تسجيل الخروج"
+          >
+            <LogoutRoundedIcon fontSize="small" />
+            <span>تسجيل الخروج</span>
+          </button>
         </div>
       </aside>
 
@@ -194,7 +200,7 @@ export default function ClientLayout({
         {activeTab === 'messages' && <Messages onNavigate={handleNavigation} userName="عبدالله العتيبي" userRole="حساب عميل" />}
         {activeTab === 'ai' && (
           consultationSubView === 'conversation' ? (
-            <SmartConversation 
+            <SmartConversation
               onNavigate={handleNavigation}
               onNewProject={() => handleNavigation('projects')}
               initialData={consultationData}
@@ -202,8 +208,8 @@ export default function ClientLayout({
               initialMessage={consultationData?.message}
             />
           ) : (
-            <SmartConsultation 
-              onNavigate={handleNavigation} 
+            <SmartConsultation
+              onNavigate={handleNavigation}
             />
           )
         )}

@@ -1046,7 +1046,16 @@ export default function Messages({ userName = "عبدالله العتيبي", u
                 onClick={() => {
                   setShowEditProjectModal(false);
                   if (onNavigate) {
-                    onNavigate('review-deliverables');
+                    onNavigate('review-deliverables', {
+                    id: 1,
+                    key: 'sallet',
+                    title: projectName || 'متجر سلة الخير',
+                    name: projectName || 'متجر سلة الخير',
+                    fullTitle: 'متجر سلة الخير - تطوير واجهات المتجر',
+                    deliverableTitle: 'نماذج وتصميم واجهات متجر سلة الخير',
+                    code: 'AC-019',
+                    leader: 'أحمد السالم'
+                  });
                   }
                 }}
                 style={{ background: '#14A800', color: '#fff', border: 'none', borderRadius: '8px', padding: '9px 22px', fontSize: '12px', fontWeight: '700', cursor: 'pointer' }}

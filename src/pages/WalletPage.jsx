@@ -37,6 +37,13 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
   const [depositAmount, setDepositAmount] = useState('5,000');
   const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' أو 'wire'
 
+  // حقول نموذج بطاقة الدفع
+  const [cardNumber, setCardNumber] = useState('');
+  const [cardCvv, setCardCvv] = useState('');
+  const [cardExpiry, setCardExpiry] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [cardErrors, setCardErrors] = useState({});
+
   // بيانات استرداد الرصيد وحساب البنك
   const [withdrawAmount, setWithdrawAmount] = useState('12,500');
   const [bankName, setBankName] = useState('الراجحي');
@@ -359,7 +366,14 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
               <button type="button" onClick={() => setActiveModal(null)} style={{ flex: 1, background: '#fff', border: '1px solid #CBD5E1', padding: '12px', borderRadius: '10px', fontWeight: '700', cursor: 'pointer', color: '#344054' }}>
                 إلغاء
               </button>
-              <button type="button" onClick={() => setActiveModal('success-action')} style={{ flex: 2, background: '#14A800', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: '800', cursor: 'pointer' }}>
+              <button 
+                type="button" 
+                onClick={() => {
+                  alert(`تم إيداع مبلغ ${depositAmount || '5,000'} ر.س بنجاح في محفظتك!`);
+                  setActiveModal(null);
+                }} 
+                style={{ flex: 2, background: '#14A800', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: '800', cursor: 'pointer' }}
+              >
                 تأكيد الإيداع وإتمام العملية ←
               </button>
             </div>
@@ -481,6 +495,10 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
                 onClick={() => {
                   if (paymentMethod === 'card') {
                     setActiveModal('payment-form');
+                  } else if (paymentMethod === 'apple') {
+                    setActiveModal('apple-pay');
+                  } else if (paymentMethod === 'wallet') {
+                    setActiveModal('wallet-pay');
                   } else {
                     setActiveModal('success-action');
                   }
@@ -533,6 +551,119 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
 
             <button type="button" onClick={() => setActiveModal('success-action')} style={{ width: '100%', background: '#14A800', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: '800', cursor: 'pointer' }}>
               تأكيد الدفع 8,000 ر.س
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 4b. مودال Apple Pay */}
+      {activeModal === 'apple-pay' && (
+        <div className="modal-overlay-custom">
+          <div className="modal-card-custom" style={{ width: '400px', textAlign: 'right' }}>
+            <div className="modal-top-row">
+              <span style={{ fontSize: '16px', fontWeight: '900' }}>← بيانات الدفع</span>
+              <button className="close-btn" onClick={() => setActiveModal('escrow')}><CloseIcon sx={{ fontSize: 16 }} /></button>
+            </div>
+
+            {/* المبلغ المطلوب */}
+            <div style={{ background: '#F9FAFB', border: '1px solid #EAEAEA', borderRadius: '10px', padding: '12px 16px', marginBottom: '20px', textAlign: 'right' }}>
+              <span style={{ fontSize: '12px', color: '#667085' }}>المبلغ المطلوب: </span>
+              <strong style={{ fontSize: '13px', color: '#181818' }}>4,000 ر.س</strong>
+            </div>
+
+            {/* Apple Pay Logo */}
+            <div style={{ background: '#000000', borderRadius: '14px', padding: '28px 20px', textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                  <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                </svg>
+                <span style={{ color: '#ffffff', fontSize: '28px', fontWeight: '300', letterSpacing: '1px' }}>Pay</span>
+              </div>
+            </div>
+
+            {/* Face ID */}
+            <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+              <div style={{ fontSize: '36px', marginBottom: '8px' }}>
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#667085" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ display: 'inline-block' }}>
+                  <path d="M9 3H5a2 2 0 00-2 2v4m6-6h6m-6 0v18m6-18h4a2 2 0 012 2v4M3 9v6m18-6v6M3 15v4a2 2 0 002 2h4m10-6v4a2 2 0 01-2 2h-4"/>
+                  <path d="M9 10v.01M15 10v.01M9.5 14.5s.9 1 2.5 1 2.5-1 2.5-1"/>
+                </svg>
+              </div>
+              <p style={{ fontSize: '11.5px', color: '#667085', margin: 0 }}>
+                انقر مرتين على الزر الجانبي للتأكيد بواسطة Face ID
+              </p>
+            </div>
+
+            {/* رابط الأمان */}
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <span style={{ fontSize: '11px', color: '#14A800', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                <LockOutlinedIcon sx={{ fontSize: 13 }} /> دفع مشفر وآمن 100%
+              </span>
+            </div>
+
+            {/* زر الدفع */}
+            <button
+              type="button"
+              onClick={() => setActiveModal('success-action')}
+              style={{ width: '100%', background: '#000000', color: '#fff', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: '800', cursor: 'pointer', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              الدفع بواسطة Apple Pay (4,000 ر.س)
+            </button>
+
+            <button type="button" onClick={() => setActiveModal('escrow')} style={{ width: '100%', background: 'transparent', border: 'none', color: '#667085', fontSize: '12px', cursor: 'pointer', marginTop: '12px', padding: '6px' }}>
+              العودة لمراجعة العقد
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 4c. مودال الدفع من المحفظة */}
+      {activeModal === 'wallet-pay' && (
+        <div className="modal-overlay-custom">
+          <div className="modal-card-custom" style={{ width: '400px', textAlign: 'right' }}>
+            <div className="modal-top-row">
+              <span style={{ fontSize: '16px', fontWeight: '900' }}>← الدفع من المحفظة</span>
+              <button className="close-btn" onClick={() => setActiveModal('escrow')}><CloseIcon sx={{ fontSize: 16 }} /></button>
+            </div>
+
+            {/* بطاقة الرصيد الخضراء */}
+            <div style={{ background: '#F0FDF4', border: '1px solid #DCFCE7', borderRadius: '12px', padding: '16px 18px', marginBottom: '16px' }}>
+              <div style={{ marginBottom: '10px' }}>
+                <span style={{ fontSize: '12px', color: '#166534', fontWeight: '800' }}>الرصيد المتاح حالياً: </span>
+                <strong style={{ fontSize: '16px', color: '#14A800' }}>12,500 ر.س</strong>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#475467', marginBottom: '6px' }}>
+                <span>المبلغ المطلوب حجزه:</span>
+                <span>4,000 ر.س</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#475467' }}>
+                <span>الرصيد المتبقي بعد العملية:</span>
+                <strong style={{ color: '#181818' }}>8,500 ر.س</strong>
+              </div>
+            </div>
+
+            {/* نص الضمان */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', background: '#F9FAFB', border: '1px solid #EAEAEA', borderRadius: '10px', padding: '12px', marginBottom: '20px' }}>
+              <LockOutlinedIcon sx={{ fontSize: 16, color: '#667085', marginTop: '1px', flexShrink: 0 }} />
+              <p style={{ fontSize: '11.5px', color: '#667085', margin: 0, lineHeight: '1.6' }}>
+                المبلغ يبقى محجوزاً في حساب الضمان (Escrow) ولا يُصرف إلا بعد موافقتك على التسليم
+              </p>
+            </div>
+
+            {/* زر التأكيد */}
+            <button
+              type="button"
+              onClick={() => setActiveModal('success-action')}
+              style={{ width: '100%', background: '#14A800', color: '#fff', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: '800', cursor: 'pointer', fontSize: '14px', boxShadow: '0 4px 15px #14a80033' }}
+            >
+              تأكيد الدفع وحجز المبلغ
+            </button>
+
+            <button type="button" onClick={() => setActiveModal('escrow')} style={{ width: '100%', background: 'transparent', border: 'none', color: '#667085', fontSize: '12px', cursor: 'pointer', marginTop: '12px', padding: '6px', textAlign: 'center' }}>
+              العودة لمراجعة العقد
             </button>
           </div>
         </div>
@@ -784,53 +915,245 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
       {/* 11. مودال إيصال التحويل قيد التدقيق */}
       {activeModal === 'wire-receipt' && (
         <div className="modal-overlay-custom">
-          <div className="modal-card-custom" style={{ width: '480px' }}>
-            <div className="modal-top-row">
-              <span style={{ fontSize: '16px', fontWeight: '900' }}>إيصال التحويل قيد التدقيق المحاسبي</span>
-              <button className="close-btn" onClick={() => setActiveModal(null)}><CloseIcon sx={{ fontSize: 18 }} /></button>
+          <div className="modal-card-custom" style={{ width: '420px', textAlign: 'right', padding: '32px 28px' }}>
+
+            {/* زر الإغلاق */}
+            <div style={{ display: 'flex', justifyContent: 'flex-left', marginBottom: '8px' }}>
+              <button className="close-btn" onClick={() => setActiveModal(null)} style={{ marginRight: 'auto' }}>
+                <CloseIcon sx={{ fontSize: 18 }} />
+              </button>
             </div>
-            <div style={{ background: '#FEFCE8', padding: '12px', borderRadius: '8px', border: '1px solid #FEF08A', textAlign: 'right', margin: '14px 0', fontSize: '12px', color: '#854D0E' }}>
-              تم استلام صورة الإيصال بنجاح وجاري مطابقتها مع كشف الحساب البنكي خلال 15 إلى 30 دقيقة.
+
+            {/* أيقونة الساعة */}
+            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+              <div style={{
+                width: '56px', height: '56px',
+                border: '2.5px solid #14A800',
+                borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto',
+                background: '#fff'
+              }}>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#14A800" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
             </div>
-            <button type="button" onClick={() => setActiveModal(null)} style={{ width: '100%', background: '#14A800', color: '#fff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: '800', cursor: 'pointer' }}>
-              حسناً فهمت ومتابعة
+
+            {/* العنوان والوصف */}
+            <h2 style={{ fontSize: '18px', fontWeight: '900', color: '#181818', textAlign: 'center', margin: '0 0 8px 0' }}>
+              إيصال التحويل قيد التدقيق المحاسبي
+            </h2>
+            <p style={{ fontSize: '12px', color: '#667085', textAlign: 'center', lineHeight: '1.7', margin: '0 0 20px 0' }}>
+              تم استلام صورة الإيصال بنجاح وجارٍ مطابقتها<br />
+              مع كشف الحساب البنكي / ACCESS
+            </p>
+
+            {/* تفاصيل التحويل */}
+            <div style={{ border: '1px solid #EAEAEA', borderRadius: '12px', overflow: 'hidden', marginBottom: '16px' }}>
+              {[
+                { label: 'المبلغ المحول:', value: '10,000 ر.س', bold: true },
+                { label: 'اسم البنك المحول منه:', value: 'مصرف الراجحي' },
+                { label: 'اسم صاحب الحساب:', value: 'عبدالله محمد العتيبي' },
+              ].map((row, i) => (
+                <div key={i} style={{
+                  display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                  padding: '13px 16px',
+                  borderBottom: i < 2 ? '1px solid #F1F5F9' : 'none',
+                  background: '#fff'
+                }}>
+                  <span style={{ fontSize: '12px', color: '#667085' }}>{row.label}</span>
+                  <span style={{ fontSize: '13px', fontWeight: row.bold ? '900' : '700', color: '#181818' }}>
+                    {row.value}
+                  </span>
+                </div>
+              ))}
+              {/* صف المدة */}
+              <div style={{ padding: '13px 16px', background: '#fff', borderTop: '1px solid #F1F5F9' }}>
+                <div style={{ fontSize: '12px', color: '#667085', marginBottom: '4px' }}>المدة المتوقعة للاعتماد</div>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: '#181818' }}>
+                  خلال 15 إلى 30 دقيقة خلال ساعات العمل الرسمية
+                </div>
+              </div>
+            </div>
+
+            {/* بطاقة الإشعار الخضراء */}
+            <div style={{
+              background: '#F0FDF4', border: '1px solid #DCFCE7',
+              borderRadius: '10px', padding: '12px 14px',
+              marginBottom: '20px',
+              display: 'flex', alignItems: 'flex-start', gap: '8px'
+            }}>
+              <span style={{ fontSize: '16px', marginTop: '1px' }}>🔔</span>
+              <p style={{ fontSize: '11.5px', color: '#166534', margin: 0, lineHeight: '1.6' }}>
+                سيصلك إشعار فوري وسيتم تحديث رصيد محفظتك فور اعتماد المحاسب للعملية
+              </p>
+            </div>
+
+            {/* زر التأكيد */}
+            <button
+              type="button"
+              onClick={() => setActiveModal(null)}
+              style={{
+                width: '100%', background: '#14A800', color: '#fff',
+                border: 'none', padding: '14px', borderRadius: '12px',
+                fontWeight: '800', cursor: 'pointer', fontSize: '14px',
+                boxShadow: '0 4px 15px #14a80033'
+              }}
+            >
+              حسناً، فهمت ومتابعة
             </button>
           </div>
         </div>
       )}
 
-      {/* 12. مودال أخطاء الدفع (مطابق تماماً لصورة Figma الأخيرة 100%) */}
+      {/* 12. مودال تفاصيل العملية المرفوضة وخطأ الدفع (مطابق تماماً لصورة Figma 100%) */}
       {activeModal === 'declined-error' && (
-        <div className="modal-overlay-custom">
-          <div className="modal-card-custom" style={{ width: '480px', textAlign: 'center' }}>
-            <div className="modal-top-row" style={{ justifyContent: 'flex-end', marginBottom: '0' }}>
-              <button className="close-btn" onClick={() => setActiveModal(null)}><CloseIcon sx={{ fontSize: 18 }} /></button>
+        <div className="modal-overlay-custom" onClick={() => setActiveModal(null)}>
+          <div 
+            className="modal-card-custom" 
+            style={{ 
+              width: '540px', 
+              maxWidth: '92vw', 
+              padding: '36px 32px 28px', 
+              borderRadius: '24px', 
+              textAlign: 'center', 
+              background: '#ffffff',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.2)',
+              position: 'relative'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* أيقونة الخطأ الدائرية الكبيرة المزدوجة */}
+            <div style={{ 
+              width: '64px', 
+              height: '64px', 
+              background: '#FEE4E2', 
+              borderRadius: '50%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              margin: '0 auto 20px auto' 
+            }}>
+              <div style={{
+                width: '42px',
+                height: '42px',
+                background: '#D92D20',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#fff',
+                fontSize: '26px',
+                fontWeight: '900',
+                fontFamily: 'sans-serif'
+              }}>
+                !
+              </div>
             </div>
 
-            <div style={{ width: '50px', height: '50px', background: '#FEE2E2', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 10px auto' }}>
-              <ErrorOutlineIcon sx={{ color: '#D92D20', fontSize: 28 }} />
+            {/* العنوان الرئيسي */}
+            <h2 style={{ fontSize: '22px', fontWeight: '900', color: '#101828', margin: '0 0 10px 0' }}>
+              تعذر إتمام عملية الدفع وحجز الضمان
+            </h2>
+
+            {/* النص الفرعي التوضيحي */}
+            <p style={{ fontSize: '13px', color: '#667085', margin: '0 0 24px 0', lineHeight: 1.6 }}>
+              لم نتمكن من خصم مبلغ 4,000 ر.س من بطاقتك الائتمانية المنتهية بـ (4022 ****)
+            </p>
+
+            {/* صندوق سبب الرفض والملحوظة */}
+            <div style={{ 
+              background: '#FFF6F5', 
+              border: '1px solid #FECDCA', 
+              borderRadius: '16px', 
+              padding: '20px 22px', 
+              textAlign: 'center', 
+              marginBottom: '24px' 
+            }}>
+              <p style={{ 
+                fontSize: '13px', 
+                fontWeight: '800', 
+                color: '#1D2939', 
+                margin: '0 0 16px 0',
+                lineHeight: 1.6
+              }}>
+                سبب الرفض: رصيد غير كافٍ أو تم رفض المعاملة من البنك المصدر (رمز الخطأ: 05_DECLINED)
+              </p>
+              <div style={{ borderTop: '1px solid #FEE4E2', paddingTop: '12px' }}>
+                <span style={{ fontSize: '11.5px', color: '#98A2B3' }}>
+                  ملاحظة: مسودة العقد ونطاق العمل محفوظة بالكامل ولن تضطر لإعادة ملء البيانات
+                </span>
+              </div>
             </div>
 
-            <h3 style={{ fontSize: '17px', fontWeight: '900', color: '#181818', margin: '0 0 6px 0' }}>تعذر إتمام عملية الدفع</h3>
-            <p style={{ fontSize: '11.5px', color: '#667085', margin: '0 0 14px 0' }}>لم نتمكن من إتمام عملية الخصم وإيداع المبلغ في المحفظة المالية</p>
-
-            <div style={{ background: '#FEF2F2', padding: '12px', borderRadius: '8px', border: '1px solid #FEE2E2', textAlign: 'right', marginBottom: '14px', fontSize: '11.5px', color: '#991B1B' }}>
-              <strong>سبب الرفض:</strong> رصيد غير كافٍ أو تم رفض العملية من البنك المصدر للبطاقة (رمز الخطأ: 05_DECLINED).
-            </div>
-
-            <div style={{ fontSize: '11px', color: '#667085', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-              <ShieldOutlinedIcon sx={{ fontSize: 14 }} /> لم يتم خصم أي مبالغ من حسابك البنكي
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <button type="button" onClick={() => setActiveModal('deposit')} style={{ width: '100%', background: '#14A800', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', fontWeight: '800', cursor: 'pointer' }}>
-                إعادة المحاولة / اختيار وسيلة دفع أخرى
+            {/* الأزرار والإجراءات */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <button 
+                type="button" 
+                onClick={() => {
+                  setActiveModal('payment-form');
+                }} 
+                style={{ 
+                  width: '100%', 
+                  background: '#14A800', 
+                  color: '#ffffff', 
+                  border: 'none', 
+                  padding: '13px', 
+                  borderRadius: '12px', 
+                  fontWeight: '800', 
+                  fontSize: '14px', 
+                  cursor: 'pointer',
+                  fontFamily: 'inherit',
+                  boxShadow: '0 2px 8px rgba(20, 168, 0, 0.25)'
+                }}
+              >
+                إعادة المحاولة / استخدام وسيلة دفع أخرى
               </button>
-              <button type="button" onClick={() => setPaymentMethod('wire') || setActiveModal('deposit')} style={{ width: '100%', background: '#F8FAFC', color: '#344054', border: '1px solid #CBD5E1', padding: '10px', borderRadius: '10px', fontWeight: '700', cursor: 'pointer' }}>
-                الدفع عبر التحويل البنكي المباشر
+
+              <button 
+                type="button" 
+                onClick={() => {
+                  setPaymentMethod('wire');
+                  setActiveModal('deposit');
+                }} 
+                style={{ 
+                  width: '100%', 
+                  background: '#ffffff', 
+                  color: '#344054', 
+                  border: '1px solid #D0D5DD', 
+                  padding: '12px', 
+                  borderRadius: '12px', 
+                  fontWeight: '800', 
+                  fontSize: '13.5px', 
+                  cursor: 'pointer',
+                  fontFamily: 'inherit'
+                }}
+              >
+                التحويل عبر الحساب البنكي المباشر
               </button>
-              <button type="button" onClick={() => setActiveModal(null)} style={{ background: 'transparent', border: 'none', color: '#667085', fontSize: '11px', cursor: 'pointer', marginTop: '4px', textDecoration: 'underline' }}>
-                إلغاء والعودة
+
+              <button 
+                type="button" 
+                onClick={() => {
+                  if (onNavigate) {
+                    onNavigate('messages');
+                  }
+                  setActiveModal(null);
+                }} 
+                style={{ 
+                  background: 'transparent', 
+                  border: 'none', 
+                  color: '#14A800', 
+                  fontSize: '12.5px', 
+                  fontWeight: '700', 
+                  cursor: 'pointer', 
+                  marginTop: '6px',
+                  fontFamily: 'inherit'
+                }}
+              >
+                مراسلة الدعم المالي للمساعدة
               </button>
             </div>
           </div>

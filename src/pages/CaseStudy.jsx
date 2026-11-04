@@ -1,6 +1,6 @@
 import React from 'react';
 import './CaseStudy.css';
-import kkkImage from '../images/kkkk.jpeg';
+import madarImage from '../images/mmm.jpeg';
 
 // MUI Icons
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
@@ -32,7 +32,7 @@ export default function CaseStudy({ onNavigate, onRegister }) {
       <div className="case-hero-banner">
         <div className="case-hero-inner">
           <img 
-            src={kkkImage} 
+            src={madarImage} 
             alt="مدار - لوحة التحكم" 
             className="hero-laptop-img"
           />

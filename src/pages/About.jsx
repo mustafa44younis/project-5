@@ -56,25 +56,29 @@ export default function About({ onNavigate, onLogin, onRegister }) {
       name: "ريم السالم",
       role: "الإدارة والمنتج والإشراف",
       desc: "تعمل على إدارة وتطوير المنتجات",
-      img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop"
+      img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=400&auto=format&fit=crop",
+      position: "center 20%"
     },
     {
       name: "عمر الحسن",
       role: "القائد التقني",
       desc: "خبرة في التطوير وبناء الأنظمة",
-      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop"
+      img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=400&auto=format&fit=crop",
+      position: "center 20%"
     },
     {
       name: "ليان مراد",
       role: "قائدة تجربة المستخدم",
       desc: "تحول الأفكار إلى تجربة سهلة",
-      img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&auto=format&fit=crop"
+      img: "https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=400&auto=format&fit=crop",
+      position: "center 20%"
     },
     {
       name: "يوسف عمران",
       role: "هندسة الجودة والتسليم",
       desc: "تضمن الجودة في أفضل شكل",
-      img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop"
+      img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?q=80&w=400&auto=format&fit=crop",
+      position: "center 20%"
     }
   ];
 
@@ -175,7 +179,7 @@ export default function About({ onNavigate, onLogin, onRegister }) {
           {team.map((member, i) => (
             <div className="team-card" key={i}>
               <div className="team-img-box">
-                <img src={member.img} alt={member.name} />
+                <img src={member.img} alt={member.name} style={{ objectPosition: member.position || "center 20%" }} />
               </div>
               <h3>{member.name}</h3>
               <span className="team-role">{member.role}</span>

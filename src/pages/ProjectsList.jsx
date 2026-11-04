@@ -32,6 +32,7 @@ export default function ProjectsList({ onNavigate }) {
       subtitle: 'تصميم واجهات وتجربة المستخدم UI/UX',
       code: 'AC-019',
       leader: 'قائد المشروع: أحمد السالم',
+      leaderImg: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
       leaderRole: 'قائد المشروع • مصمم واجهات',
       status: 'قيد التنفيذ',
       statusClass: 'in-progress',
@@ -48,6 +49,7 @@ export default function ProjectsList({ onNavigate }) {
       subtitle: 'تصميم وإبداع - بدأ في 01 أكتوبر 2026',
       code: 'AC-023',
       leader: 'قائد المشروع: سارة القحطاني',
+      leaderImg: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
       leaderRole: 'قائد الفريق • مصممة هوية',
       status: 'بانتظار المراجعة',
       statusClass: 'pending',
@@ -64,6 +66,7 @@ export default function ProjectsList({ onNavigate }) {
       subtitle: 'تصميم واجهات وتجربة المستخدم UI/UX',
       code: 'AC-031',
       leader: 'قائد المشروع: خالد الحربي',
+      leaderImg: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100',
       leaderRole: 'قائد المشروع • مطور تطبيقات',
       status: 'قيد التنفيذ',
       statusClass: 'in-progress',
@@ -280,9 +283,13 @@ export default function ProjectsList({ onNavigate }) {
                 {project.title}
               </h2>
               <p className="proj-sub">{project.subtitle}</p>
-              <div className="proj-leader-info">
-                <PersonOutlineRoundedIcon sx={{ fontSize: 16, color: '#667085', verticalAlign: 'text-bottom', ml: 0.5 }} /> 
-                {project.leader}
+              <div className="proj-leader-info" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <img 
+                  src={project.leaderImg} 
+                  alt={project.leader} 
+                  style={{ width: '22px', height: '22px', borderRadius: '50%', objectFit: 'cover' }} 
+                />
+                <span>{project.leader}</span>
               </div>
 
               <div className="proj-progress-section">
@@ -309,21 +316,12 @@ export default function ProjectsList({ onNavigate }) {
             </div>
 
             <div className="proj-card-actions">
-              {project.status === 'بانتظار المراجعة' ? (
-                <button 
-                  className="btn-review-outline" 
-                  onClick={() => onNavigate ? onNavigate('review-deliverables', project) : handleOpenProjectDetails(project)}
-                >
-                  مراجعة المخرجات
-                </button>
-              ) : (
-                <button 
-                  className="btn-details-link" 
-                  onClick={() => handleOpenProjectDetails(project)}
-                >
-                  {project.nextAction}
-                </button>
-              )}
+              <button 
+                className="btn-review-outline" 
+                onClick={() => onNavigate ? onNavigate('review-deliverables', project) : handleOpenProjectDetails(project)}
+              >
+                مراجعة المخرجات
+              </button>
               {/* زر عرض تفاصيل المشروع المربوط مباشرة بصفحة ProjectDetails */}
               <button 
                 className="btn-details-link" 
@@ -352,7 +350,7 @@ export default function ProjectsList({ onNavigate }) {
           </div>
           <button 
             className="btn-banner-white" 
-            onClick={() => handleOpenProjectDetails(projects[1])}
+            onClick={() => onNavigate ? onNavigate('review-deliverables', projects[1]) : handleOpenProjectDetails(projects[1])}
           >
             مراجعة المخرجات
           </button>
