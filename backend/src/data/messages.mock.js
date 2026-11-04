@@ -1,0 +1,48 @@
+// بيانات وهمية للرسائل بين المستخدمين
+export const messages = [
+  {
+    id: 'msg1',
+    senderId: 'u1',
+    receiverId: 'u2',
+    content: 'مرحباً أحمد، أريد مناقشة تفاصيل مشروع منصة التجارة الإلكترونية.',
+    timestamp: '2026-01-10T09:00:00Z',
+    read: true,
+    projectId: 'p1',
+  },
+  {
+    id: 'msg2',
+    senderId: 'u2',
+    receiverId: 'u1',
+    content: 'أهلاً عبدالله، بكل سرور. متى يمكنك الاجتماع لمراجعة المتطلبات؟',
+    timestamp: '2026-01-10T09:15:00Z',
+    read: true,
+    projectId: 'p1',
+  },
+  {
+    id: 'msg3',
+    senderId: 'u1',
+    receiverId: 'u2',
+    content: 'يمكنني غداً الساعة 2 ظهراً، هل يناسبك؟',
+    timestamp: '2026-01-10T09:30:00Z',
+    read: true,
+    projectId: 'p1',
+  },
+  {
+    id: 'msg4',
+    senderId: 'u2',
+    receiverId: 'u1',
+    content: 'ممتاز، سأكون جاهزاً. هل يمكنك إرسال ملف المتطلبات مسبقاً؟',
+    timestamp: '2026-01-10T09:45:00Z',
+    read: false,
+    projectId: 'p1',
+  },
+  {
+    id: 'msg5',
+    senderId: 'u1',
+    receiverId: 'u2',
+    content: 'تم إنهاء مرحلة التصميم بشكل رائع، شكراً جزيلاً!',
+    timestamp: '2026-01-15T14:00:00Z',
+    read: false,
+    projectId: 'p2',
+  },
+];
