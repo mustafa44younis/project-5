@@ -4,13 +4,13 @@ import NotificationsNoneRoundedIcon from '@mui/icons-material/NotificationsNoneR
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 
 export default function TopHeader({ 
-  userName = "عبدالله العتيبي", 
+  userName = "عبد الله العتيبي", 
   greetingName,
   userRole = "حساب عميل", 
   onNewProject,
   embedded = false 
 }) {
-  const displayGreeting = greetingName || (userName ? userName.split(' ')[0] : 'عبدالله');
+  const displayGreeting = greetingName || (userName ? userName.split(' ').slice(0, 2).join(' ') : 'عبد الله');
 
   return (
     <header className={`dash-top-header ${embedded ? 'embedded' : ''}`} dir="rtl">

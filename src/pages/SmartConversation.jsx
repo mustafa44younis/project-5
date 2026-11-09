@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import TopHeader from '../components/TopHeader';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
@@ -12,7 +12,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import './SmartConversation.css';
 
 export default function SmartConversation({ 
-  userName = "عبدالله محمد", 
+  userName = "عبد الله محمد", 
   userRole = "حساب عميل", 
   onNewProject,
   onNavigate,

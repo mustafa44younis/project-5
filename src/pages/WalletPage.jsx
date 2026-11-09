@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
 import './WalletPage.css';
 
@@ -71,7 +71,7 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
       
       {/* 1. التوب هيدر العلوي */}
       <TopHeader 
-        userName="عبدالله العتيبي" 
+        userName="عبد الله العتيبي" 
         userRole="حساب عميل" 
         onNewProject={() => onNavigate && onNavigate('new-project')} 
       />
@@ -865,7 +865,7 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
                 <div>
                   <div>رقم الفاتورة: <strong>INV-2026-0091</strong></div>
                   <div>تاريخ الإصدار: <strong>15 أكتوبر 2026</strong></div>
-                  <div>العميل: <strong>عبدالله محمد العتيبي</strong></div>
+                  <div>العميل: <strong>عبد الله محمد العتيبي</strong></div>
                 </div>
                 <div>
                   <div>المورد: <strong>شركة ACCESS للحلول البرمجية</strong></div>
@@ -955,7 +955,7 @@ export default function WalletPage({ onNavigate, initialModal = null }) {
               {[
                 { label: 'المبلغ المحول:', value: '10,000 ر.س', bold: true },
                 { label: 'اسم البنك المحول منه:', value: 'مصرف الراجحي' },
-                { label: 'اسم صاحب الحساب:', value: 'عبدالله محمد العتيبي' },
+                { label: 'اسم صاحب الحساب:', value: 'عبد الله محمد العتيبي' },
               ].map((row, i) => (
                 <div key={i} style={{
                   display: 'flex', justifyContent: 'space-between', alignItems: 'center',

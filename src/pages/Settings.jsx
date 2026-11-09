@@ -14,7 +14,7 @@ import AddRoundedIcon from '@mui/icons-material/AddRounded';
 import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import './Settings.css';
 
-export default function Settings({ userName = "عبدالله محمد", userRole = "حساب عميل", onNewProject, onNavigate }) {
+export default function Settings({ userName = "عبد الله العتيبي", userRole = "حساب عميل", onNewProject, onNavigate }) {
   // حالة الإشعارات
   const [notifications, setNotifications] = useState({
     projectUpdatesApp: true,
@@ -44,7 +44,7 @@ export default function Settings({ userName = "عبدالله محمد", userRol
       type: 'Mastercard',
       last4: '4821',
       expiry: '12/28',
-      holder: 'Abdullah Mohammed',
+      holder: 'Abdullah Al-Otaibi',
       isDefault: true
     }
   ]);

@@ -178,7 +178,11 @@ function SignupScreen({ onSignup, go, onClose }) {
   const validate = () => {
     const newErrors = {};
     if (!fullName.trim()) newErrors.fullName = "يرجى كتابة الاسم الكامل";
-    if (!email.trim()) newErrors.email = "يرجى كتابة البريد الإلكتروني";
+    if (!email.trim()) {
+      newErrors.email = "يرجى كتابة البريد الإلكتروني";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      newErrors.email = "يرجى إدخال بريد إلكتروني صحيح (مثال: name@gmail.com)";
+    }
     if (!phone.trim()) newErrors.phone = "يرجى كتابة رقم الهاتف";
     if (!password.trim()) newErrors.password = "يرجى كتابة كلمة المرور";
     setErrors(newErrors);
@@ -274,7 +278,9 @@ function LoginScreen({ onLogin, go, onClose }) {
     const newErrors = {};
 
     if (!email.trim()) {
-      newErrors.email = "يرجى كتابة البريد الإلكتروني أو اسم المستخدم";
+      newErrors.email = "يرجى كتابة البريد الإلكتروني";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      newErrors.email = "يرجى إدخال بريد إلكتروني صحيح (مثال: name@gmail.com)";
     }
 
     if (!password.trim()) {

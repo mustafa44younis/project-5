@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import TopHeader from '../components/TopHeader';
 import AutoAwesomeRoundedIcon from '@mui/icons-material/AutoAwesomeRounded';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -66,8 +66,8 @@ export default function SmartConsultation({ onNavigate }) {
       <div className="consultation-card-main">
         {/* 1. الهيدر العلوي المدمج */}
         <TopHeader 
-          userName="عبدالله العتيبي" 
-          greetingName="عبدالله"
+          userName="عبد الله العتيبي" 
+          greetingName="عبد الله"
           userRole="حساب عميل" 
           embedded={true}
           onNewProject={() => onNavigate && onNavigate('new-project')} 

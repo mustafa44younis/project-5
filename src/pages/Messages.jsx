@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import TopHeader from '../components/TopHeader';
 
 // MUI Icons Imports
@@ -38,7 +38,7 @@ import './Messages.css';
 import emptyMessagesImg from '../images/empty-messages.png';
 import basketVegetablesImg from '../images/basket-vegetables.jpg';
 
-export default function Messages({ userName = "عبدالله العتيبي", userRole = "حساب عميل", onNewProject, onNavigate }) {
+export default function Messages({ userName = "عبد الله العتيبي", userRole = "حساب عميل", onNewProject, onNavigate }) {
   // المحادثة النشطة حالياً
   const [activeChatId, setActiveChatId] = useState('chat1');
   const [filterType, setFilterType] = useState('all'); // 'all', 'unread'
@@ -148,7 +148,7 @@ export default function Messages({ userName = "عبدالله العتيبي", u
       id: 1,
       sender: 'other',
       senderName: 'أحمد السالم',
-      text: 'صباح الخير عبدالله، انتهينا من تحديث واجهات المتجر. هذا رابط التصميم للمراجعة.',
+      text: 'صباح الخير عبد الله، انتهينا من تحديث واجهات المتجر. هذا رابط التصميم للمراجعة.',
       time: '10:30 ص',
       hasFigmaLink: true,
       figmaTitle: 'واجهات متجر سلة الخير',

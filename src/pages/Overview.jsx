@@ -64,7 +64,7 @@ export default function Overview({ onNavigate }) {
     <div className="dashboard-overview-page" dir="rtl">
       {/* 1. الهيدر العلوي */}
       <TopHeader 
-        userName="عبدالله" 
+        userName="عبد الله العتيبي" 
         userRole="حساب عميل" 
         onNewProject={() => onNavigate && onNavigate('new-project')} 
       />

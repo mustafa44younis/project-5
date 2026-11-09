@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import TopHeader from '../components/TopHeader';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -111,7 +111,7 @@ export default function ProjectDetails({ onNavigate, projectData }) {
     <div className="project-details-page" dir="rtl">
       {/* 1. الهيدر العلوي الموحد */}
       <TopHeader 
-        userName="عبدالله العتيبي" 
+        userName="عبد الله العتيبي" 
         userRole="حساب عميل" 
         onNewProject={() => onNavigate && onNavigate('ai')} 
       />

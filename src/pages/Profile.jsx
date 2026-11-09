@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import TopHeader from '../components/TopHeader';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -18,13 +18,13 @@ import UploadFileOutlinedIcon from '@mui/icons-material/UploadFileOutlined';
 import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import './Profile.css';
 
-export default function Profile({ userName = "عبدالله العتيبي", userRole = "حساب عميل موثق", onNewProject, onNavigate }) {
+export default function Profile({ userName = "عبد الله العتيبي", userRole = "حساب عميل موثق", onNewProject, onNavigate }) {
   // حالة تبديل التابات داخل الملف الشخصي
   const [activeTab, setActiveTab] = useState('basic'); // 'basic', 'security', 'preferences'
 
   // بيانات نموذج التعديل
   const [formData, setFormData] = useState({
-    firstName: 'عبدالله',
+    firstName: 'عبد الله',
     lastName: 'العتيبي',
     email: 'abdullah@example.com',
     phone: '+966 5X XXX XXXX',

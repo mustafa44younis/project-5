@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
@@ -145,7 +145,7 @@ export default function FinalDelivery({ onNavigate, projectData }) {
     <div className="final-delivery-page" dir="rtl" style={{ background: '#FAFAFA', minHeight: '100vh', paddingBottom: '40px' }}>
       {/* 1. الهيدر العلوي الموحد */}
       <TopHeader 
-        userName="عبدالله العتيبي" 
+        userName="عبد الله العتيبي" 
         userRole="حساب عميل" 
         onNewProject={() => onNavigate && onNavigate('new-project')} 
       />

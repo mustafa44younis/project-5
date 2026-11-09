@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import TopHeader from '../components/TopHeader';
 import ProjectDetails from './ProjectDetails';
 import './ProjectsList.css';
@@ -124,7 +124,7 @@ export default function ProjectsList({ onNavigate }) {
     <div className="projects-list-page" dir="rtl">
       {/* 1. الهيدر العلوي الموحد */}
       <TopHeader 
-        userName="عبدالله العتيبي" 
+        userName="عبد الله العتيبي" 
         userRole="حساب عميل" 
         onNewProject={() => onNavigate && onNavigate('ai')} 
       />

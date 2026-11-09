@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import SmartConsultation from '../pages/SmartConsultation';
 import SmartConversation from '../pages/SmartConversation';
 import Overview from '../pages/Overview';
@@ -197,7 +197,7 @@ export default function ClientLayout({
         {activeTab === 'wallet' && <WalletPage onNavigate={handleNavigation} initialModal={walletModal} />} {/* <-- عرض صفحة المحفظة المالية هنا بنجاح */}
         {activeTab === 'settings' && <Settings onNavigate={handleNavigation} />}
         {activeTab === 'profile' && <Profile onNavigate={handleNavigation} />}
-        {activeTab === 'messages' && <Messages onNavigate={handleNavigation} userName="عبدالله العتيبي" userRole="حساب عميل" />}
+        {activeTab === 'messages' && <Messages onNavigate={handleNavigation} userName="عبد الله العتيبي" userRole="حساب عميل" />}
         {activeTab === 'ai' && (
           consultationSubView === 'conversation' ? (
             <SmartConversation

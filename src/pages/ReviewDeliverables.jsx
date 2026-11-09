@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
 import './ReviewDeliverables.css';
 import basketVegetablesImg from '../images/basket-vegetables.jpg';
@@ -55,8 +55,8 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
         typographySub: 'TAJAWAL / BOLD - REGULAR'
       },
       initialComments: [
-        { page: 3, title: 'توازن الشعار والرمز', text: 'أقترح زيادة المسافة بين الرمز واسم نواة قليلاً، ليظهر الشعار بوضوح أكبر في التطبيقات المصغرة والشاشات.', author: 'عبدالله العتيبي • أنت', time: '10:52 ص' },
-        { page: 3, title: 'درجة اللون الثانوي', text: 'هل يمكن تجربة درجة أدفأ من الأخضر الفاتح في لوحة الألوان لتلائم ورق الطباعة غير المصقول؟', author: 'عبدالله العتيبي • أنت', time: '10:56 ص' },
+        { page: 3, title: 'توازن الشعار والرمز', text: 'أقترح زيادة المسافة بين الرمز واسم نواة قليلاً، ليظهر الشعار بوضوح أكبر في التطبيقات المصغرة والشاشات.', author: 'عبد الله العتيبي • أنت', time: '10:52 ص' },
+        { page: 3, title: 'درجة اللون الثانوي', text: 'هل يمكن تجربة درجة أدفأ من الأخضر الفاتح في لوحة الألوان لتلائم ورق الطباعة غير المصقول؟', author: 'عبد الله العتيبي • أنت', time: '10:56 ص' },
         { page: 5, title: 'تطبيقات الشعار الرقمية', text: 'تم اعتماد التدرج المخصص للشاشات الرقمية والتطبيقات، ممتاز جداً ومتناسق.', author: 'سارة القحطاني • مصممة الهوية', time: '11:20 ص' }
       ]
     },
@@ -95,8 +95,8 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
         typographySub: 'INTER & TAJAWAL / UI OPTIMIZED'
       },
       initialComments: [
-        { page: 4, title: 'زر الإضافة إلى السلة', text: 'أقترح تكبير زر "أضف للسلة" في بطاقة الخضار مع إظهار مؤشر فوري للعدد (عداد الكمية) دون مغادرة الصفحة.', author: 'عبدالله العتيبي • أنت', time: '09:30 ص' },
-        { page: 7, title: 'شاشة إتمام الدفع والتوصيل', text: 'تجربة اختيار وقت التوصيل (صباحاً/مساءً) ممتازة جداً وواضحة للعملاء في منطقة الرياض.', author: 'عبدالله العتيبي • أنت', time: '09:45 ص' },
+        { page: 4, title: 'زر الإضافة إلى السلة', text: 'أقترح تكبير زر "أضف للسلة" في بطاقة الخضار مع إظهار مؤشر فوري للعدد (عداد الكمية) دون مغادرة الصفحة.', author: 'عبد الله العتيبي • أنت', time: '09:30 ص' },
+        { page: 7, title: 'شاشة إتمام الدفع والتوصيل', text: 'تجربة اختيار وقت التوصيل (صباحاً/مساءً) ممتازة جداً وواضحة للعملاء في منطقة الرياض.', author: 'عبد الله العتيبي • أنت', time: '09:45 ص' },
         { page: 12, title: 'وسام المنتجات العضوية', text: 'تمت إضافة وسام "عضوي 100%" بالأخضر الفاتح على المنتجات المعتمدة بناءً على رغبتكم.', author: 'أحمد السالم • مصمم واجهات', time: '10:15 ص' }
       ]
     },
@@ -135,8 +135,8 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
         typographySub: 'IBM PLEX SANS ARABIC / MOBILE UI'
       },
       initialComments: [
-        { page: 5, title: 'تقسيم فترات المواعيد', text: 'نرغب بجعل أوقات الصباح والمساء مقسمة في تبويبين منفصلين لسهولة الاختيار على المرضى والمراجعين.', author: 'عبدالله العتيبي • أنت', time: '02:15 م' },
-        { page: 8, title: 'بطاقة تأكيد الحجز والتقويم', text: 'ممتازة فكرة إضافة زر "إضافة للتقويم (Google / Apple Calendar)" مباشرة بعد الضغط على تأكيد.', author: 'عبدالله العتيبي • أنت', time: '02:40 م' },
+        { page: 5, title: 'تقسيم فترات المواعيد', text: 'نرغب بجعل أوقات الصباح والمساء مقسمة في تبويبين منفصلين لسهولة الاختيار على المرضى والمراجعين.', author: 'عبد الله العتيبي • أنت', time: '02:15 م' },
+        { page: 8, title: 'بطاقة تأكيد الحجز والتقويم', text: 'ممتازة فكرة إضافة زر "إضافة للتقويم (Google / Apple Calendar)" مباشرة بعد الضغط على تأكيد.', author: 'عبد الله العتيبي • أنت', time: '02:40 م' },
         { page: 14, title: 'نظام التنبيهات المسبقة', text: 'تم تجهيز إشعار التذكير التلقائي قبل ساعتين من موعد الزيارة مع رابط الخريطة.', author: 'خالد الحربي • مطور التطبيقات', time: '03:10 م' }
       ]
     }
@@ -183,7 +183,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
       page: targetPage,
       title: `ملاحظة جديدة على ص ${targetPage}`,
       text: newComment,
-      author: 'عبدالله العتيبي • أنت',
+      author: 'عبد الله العتيبي • أنت',
       time: 'الآن'
     };
 
@@ -199,7 +199,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
     <div className="review-deliverables-page" dir="rtl">
       {/* 1. الهيدر العلوي الموحد */}
       <TopHeader 
-        userName="عبدالله العتيبي" 
+        userName="عبد الله العتيبي" 
         userRole="حساب عميل" 
         onNewProject={() => onNavigate && onNavigate('ai')} 
       />
