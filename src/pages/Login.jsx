@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import logoImage from '../images/Aaw.png';
 import './Login.css';
+import { useAuth } from '../context/AuthContext';
+import { authService } from '../services/auth.service';
+import { API_BASE_URL } from '../constants/api.constants';
 
 // MUI Icons
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
@@ -151,10 +154,10 @@ function Socials() {
     <>
       <div className="divider">أو تسجيل الدخول عبر</div>
       <div className="socials">
-        <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="soc" style={{ textDecoration: 'none' }}>
+        <a href={`${API_BASE_URL}/auth/linkedin?role=client`} className="soc" style={{ textDecoration: 'none' }}>
           <span className="in">in</span> LinkedIn
         </a>
-        <a href="https://accounts.google.com" target="_blank" rel="noopener noreferrer" className="soc" style={{ textDecoration: 'none' }}>
+        <a href={`${API_BASE_URL}/auth/google?role=client`} className="soc" style={{ textDecoration: 'none' }}>
           <span className="g">G</span> Google
         </a>
       </div>
@@ -165,6 +168,7 @@ function Socials() {
 /* ================= شاشات المصادقة الفرعية ================= */
 
 function SignupScreen({ onSignup, go, onClose }) {
+  const { register } = useAuth();
   const [role, setRole] = useState(0);
   const roles = ["صاحب عمل / عميل", "قائد فريق", "مستقل محترف"];
 
@@ -174,34 +178,77 @@ function SignupScreen({ onSignup, go, onClose }) {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const validate = () => {
     const newErrors = {};
-    if (!fullName.trim()) newErrors.fullName = "يرجى كتابة الاسم الكامل";
+    if (!fullName.trim() || fullName.trim().length < 3) {
+      newErrors.fullName = "يرجى كتابة الاسم الكامل (3 أحرف على الأقل)";
+    }
     if (!email.trim()) {
       newErrors.email = "يرجى كتابة البريد الإلكتروني";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       newErrors.email = "يرجى إدخال بريد إلكتروني صحيح (مثال: name@gmail.com)";
     }
-    if (!phone.trim()) newErrors.phone = "يرجى كتابة رقم الهاتف";
-    if (!password.trim()) newErrors.password = "يرجى كتابة كلمة المرور";
+    if (!password.trim() || password.length < 6) {
+      newErrors.password = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError("");
     if (!validate()) return;
-    if (onSignup) {
-      onSignup(email);
-    } else {
-      go("success");
+
+    setIsLoading(true);
+    try {
+      const res = await register({
+        full_name: fullName.trim(),
+        email: email.trim(),
+        phone: phone.trim() || null,
+        password,
+        role,
+      });
+
+      if (res?.success) {
+        if (onSignup) {
+          onSignup(email.trim(), res?.data?.user);
+        } else {
+          go("success");
+        }
+      }
+    } catch (err) {
+      const msg = err.errors && Array.isArray(err.errors)
+        ? err.errors.join('، ')
+        : (err.message || "حدث خطأ أثناء إنشاء الحساب، يرجى المحاولة لاحقاً");
+      setServerError(msg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="form-side">
       <FormHeader title="ابدأ رحلتك مع ACCESS" desc="حساب واحد، وفرص لا حدود لها. اختر دورك لدينا" onClose={onClose} />
+      
+      {serverError && (
+        <div style={{
+          backgroundColor: '#FEE2E2',
+          color: '#DC2626',
+          padding: '10px 14px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          marginBottom: '16px',
+          border: '1px solid #FCA5A5',
+          lineHeight: '1.5'
+        }}>
+          {serverError}
+        </div>
+      )}
+
       <div className="toggle">
         {roles.map((r, i) => (
           <div key={r} className={i === role ? "on" : ""} onClick={() => setRole(i)}>{r}</div>
@@ -260,7 +307,9 @@ function SignupScreen({ onSignup, go, onClose }) {
           hint={errors.password || (password.length >= 6 ? "قوة كلمة المرور: قوية جداً" : null)}
         />
         <Checkbox>أوافق على الشروط وسياسة الخصوصية</Checkbox>
-        <button type="submit" className="btn">إنشاء حساب جديد</button>
+        <button type="submit" className="btn" disabled={isLoading}>
+          {isLoading ? "جاري إنشاء الحساب..." : "إنشاء حساب جديد"}
+        </button>
       </form>
       <div className="link">لديك حساب بالفعل؟ <button type="button" onClick={() => go("login")}>تسجيل الدخول</button></div>
     </div>
@@ -268,10 +317,13 @@ function SignupScreen({ onSignup, go, onClose }) {
 }
 
 function LoginScreen({ onLogin, go, onClose }) {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   // التحقق الإلزامي من تعبئة الحقول قبل الدخول
   const validate = () => {
@@ -291,24 +343,54 @@ function LoginScreen({ onLogin, go, onClose }) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError("");
     
     // إذا كانت الحقول فارغة يتم إيقاف الإرسال وإظهار رسائل الخطأ الحمراء
     if (!validate()) {
       return;
     }
 
-    if (onLogin) {
-      onLogin(email);
-    } else {
-      go("success");
+    setIsLoading(true);
+    try {
+      const res = await login(email.trim(), password);
+      if (res?.success) {
+        if (onLogin) {
+          onLogin(email.trim(), res?.data?.user);
+        } else {
+          go("success");
+        }
+      }
+    } catch (err) {
+      const msg = err.errors && Array.isArray(err.errors)
+        ? err.errors.join('، ')
+        : (err.message || "فشل تسجيل الدخول، تأكد من صحة البريد الإلكتروني وكلمة المرور");
+      setServerError(msg);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="form-side">
       <FormHeader title="مرحباً بعودتك" desc="سجّل دخولك وأكمل رحلة إنجازك" onClose={onClose} />
+      
+      {serverError && (
+        <div style={{
+          backgroundColor: '#FEE2E2',
+          color: '#DC2626',
+          padding: '10px 14px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          marginBottom: '16px',
+          border: '1px solid #FCA5A5',
+          lineHeight: '1.5'
+        }}>
+          {serverError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} style={{ width: '100%' }} noValidate>
         <Field 
           label="البريد الإلكتروني" 
@@ -338,11 +420,13 @@ function LoginScreen({ onLogin, go, onClose }) {
               setErrors(prev => ({ ...prev, password: null }));
             }
           }}
-          error={!!errors.password}
+          error={!!errors.password} 
           hint={errors.password} 
         />
         <Checkbox>تسجيل الدخول تلقائياً</Checkbox>
-        <button type="submit" className="btn">تسجيل الدخول</button>
+        <button type="submit" className="btn" disabled={isLoading}>
+          {isLoading ? "جاري تسجيل الدخول..." : "تسجيل الدخول"}
+        </button>
         <button type="button" className="btn ghost" onClick={() => go("reset")}>إعادة تعيين كلمة المرور</button>
       </form>
       <Socials />
@@ -352,64 +436,177 @@ function LoginScreen({ onLogin, go, onClose }) {
 }
 
 function ResetScreen({ onReset, go, onClose }) {
+  const [step, setStep] = useState("request"); // "request" | "confirm"
+  const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirmPass, setConfirmPass] = useState("");
   const [errors, setErrors] = useState({});
+  const [serverError, setServerError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const validate = () => {
-    const newErrors = {};
-    if (!newPass.trim()) newErrors.newPass = "يرجى كتابة كلمة المرور الجديدة";
-    if (!confirmPass.trim()) newErrors.confirmPass = "يرجى تأكيد كلمة المرور الجديدة";
-    else if (newPass !== confirmPass) newErrors.confirmPass = "كلمات المرور غير متطابقة";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleRequestReset = async (e) => {
+    e.preventDefault();
+    setServerError("");
+    setSuccessMsg("");
+    
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErrors({ email: "يرجى كتابة بريد إلكتروني صحيح" });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await authService.forgotPassword(email.trim());
+      setSuccessMsg("تم إرسال رابط / رمز استعادة كلمة المرور إلى بريدك الإلكتروني بنجاح.");
+      setStep("confirm");
+    } catch (err) {
+      setServerError(err.message || "تعذر إرسال رابط الاستعادة، يرجى المحاولة لاحقاً");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleConfirmReset = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
-    if (onReset) {
-      onReset();
-    } else {
-      go("success");
+    setServerError("");
+    setSuccessMsg("");
+
+    const newErrors = {};
+    if (!token.trim()) newErrors.token = "رمز التحقق أو التوكن مطلوب";
+    if (!newPass.trim() || newPass.length < 6) newErrors.newPass = "كلمة المرور يجب أن تكون 6 أحرف على الأقل";
+    if (newPass !== confirmPass) newErrors.confirmPass = "كلمات المرور غير متطابقة";
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    setIsLoading(true);
+    try {
+      await authService.resetPassword(token.trim(), newPass);
+      setSuccessMsg("تم تغيير كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.");
+      setTimeout(() => {
+        go("login");
+      }, 2000);
+    } catch (err) {
+      setServerError(err.message || "رمز التحقق غير صالح أو منتهي الصلاحية");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="form-side">
-      <FormHeader title="إعادة تعيين كلمة المرور" desc="أدخل كلمة المرور الجديدة لحسابك لتأكيد التغيير والبدء فوراً" onClose={onClose} />
-      <form onSubmit={handleSubmit} style={{ width: '100%' }} noValidate>
-        <Field 
-          label="كلمة المرور الجديدة" 
-          type="password" 
-          placeholder="••••••••" 
-          icon="lock" 
-          value={newPass}
-          onChange={(e) => {
-            setNewPass(e.target.value);
-            if (errors.newPass) setErrors(prev => ({ ...prev, newPass: null }));
-          }}
-          error={!!errors.newPass}
-          hint={errors.newPass}
-        />
-        <Field 
-          label="تأكيد كلمة المرور الجديدة" 
-          type="password" 
-          placeholder="••••••••" 
-          icon="lock" 
-          value={confirmPass}
-          onChange={(e) => {
-            setConfirmPass(e.target.value);
-            if (errors.confirmPass) setErrors(prev => ({ ...prev, confirmPass: null }));
-          }}
-          error={!!errors.confirmPass}
-          hint={errors.confirmPass}
-        />
-        <button type="submit" className="btn" style={{ marginTop: 22 }}>حفظ كلمة المرور الجديدة</button>
-        <button type="button" className="btn ghost" onClick={() => go("login")}>
-          <ArrowForwardRoundedIcon sx={{ fontSize: 16, verticalAlign: 'middle', ml: 0.5 }} /> العودة لتسجيل الدخول
-        </button>
-      </form>
+      <FormHeader 
+        title="إعادة تعيين كلمة المرور" 
+        desc={step === "request" ? "أدخل بريدك الإلكتروني المسجل لنرسل لك رابط الاستعادة" : "أدخل رمز التحقق وكلمة المرور الجديدة"} 
+        onClose={onClose} 
+      />
+
+      {successMsg && (
+        <div style={{
+          backgroundColor: '#ECFDF5',
+          color: '#059669',
+          padding: '10px 14px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          marginBottom: '16px',
+          border: '1px solid #A7F3D0',
+          lineHeight: '1.5'
+        }}>
+          {successMsg}
+        </div>
+      )}
+
+      {serverError && (
+        <div style={{
+          backgroundColor: '#FEE2E2',
+          color: '#DC2626',
+          padding: '10px 14px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          marginBottom: '16px',
+          border: '1px solid #FCA5A5',
+          lineHeight: '1.5'
+        }}>
+          {serverError}
+        </div>
+      )}
+
+      {step === "request" ? (
+        <form onSubmit={handleRequestReset} style={{ width: '100%' }} noValidate>
+          <Field 
+            label="البريد الإلكتروني" 
+            placeholder="name@gmail.com" 
+            icon="mail" 
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (errors.email) setErrors(prev => ({ ...prev, email: null }));
+            }}
+            error={!!errors.email}
+            hint={errors.email}
+          />
+          <button type="submit" className="btn" style={{ marginTop: 20 }} disabled={isLoading}>
+            {isLoading ? "جاري الإرسال..." : "إرسال رابط الاستعادة"}
+          </button>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 12 }}>
+            <button type="button" className="btn ghost" onClick={() => setStep("confirm")}>
+              لدي رمز تحقق مسبقاً
+            </button>
+            <button type="button" className="btn ghost" onClick={() => go("login")}>
+              <ArrowForwardRoundedIcon sx={{ fontSize: 16, verticalAlign: 'middle', ml: 0.5 }} /> العودة للدخول
+            </button>
+          </div>
+        </form>
+      ) : (
+        <form onSubmit={handleConfirmReset} style={{ width: '100%' }} noValidate>
+          <Field 
+            label="رمز التحقق (Token)" 
+            placeholder="أدخل الرمز أو التوكن المستلم" 
+            icon="lock" 
+            value={token}
+            onChange={(e) => {
+              setToken(e.target.value);
+              if (errors.token) setErrors(prev => ({ ...prev, token: null }));
+            }}
+            error={!!errors.token}
+            hint={errors.token}
+          />
+          <Field 
+            label="كلمة المرور الجديدة" 
+            type="password" 
+            placeholder="••••••••" 
+            icon="lock" 
+            value={newPass}
+            onChange={(e) => {
+              setNewPass(e.target.value);
+              if (errors.newPass) setErrors(prev => ({ ...prev, newPass: null }));
+            }}
+            error={!!errors.newPass}
+            hint={errors.newPass}
+          />
+          <Field 
+            label="تأكيد كلمة المرور الجديدة" 
+            type="password" 
+            placeholder="••••••••" 
+            icon="lock" 
+            value={confirmPass}
+            onChange={(e) => {
+              setConfirmPass(e.target.value);
+              if (errors.confirmPass) setErrors(prev => ({ ...prev, confirmPass: null }));
+            }}
+            error={!!errors.confirmPass}
+            hint={errors.confirmPass}
+          />
+          <button type="submit" className="btn" style={{ marginTop: 22 }} disabled={isLoading}>
+            {isLoading ? "جاري حفظ التغيير..." : "حفظ كلمة المرور الجديدة"}
+          </button>
+          <button type="button" className="btn ghost" onClick={() => setStep("request")}>
+            <ArrowForwardRoundedIcon sx={{ fontSize: 16, verticalAlign: 'middle', ml: 0.5 }} /> العودة لطلب رمز جديد
+          </button>
+        </form>
+      )}
     </div>
   );
 }

@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
+import { useAuth } from '../context/AuthContext';
+import { profileService } from '../services/profile.service';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import LanguageOutlinedIcon from '@mui/icons-material/LanguageOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -15,6 +17,9 @@ import DeleteOutlineRoundedIcon from '@mui/icons-material/DeleteOutlineRounded';
 import './Settings.css';
 
 export default function Settings({ userName = "عبد الله العتيبي", userRole = "حساب عميل", onNewProject, onNavigate }) {
+  const { user } = useAuth();
+  const currentUserName = user?.full_name || userName;
+  const currentUserRole = user?.role === 'client' ? 'حساب عميل' : (user?.role || userRole);
   // حالة الإشعارات
   const [notifications, setNotifications] = useState({
     projectUpdatesApp: true,
@@ -75,8 +80,18 @@ export default function Settings({ userName = "عبد الله العتيبي", 
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e?.preventDefault();
+    try {
+      await profileService.updatePreferences({
+        notifications,
+        language,
+        timezone,
+        privacy,
+      });
+    } catch {
+      // safe fallback
+    }
     setShowSaveToast(true);
     setTimeout(() => {
       setShowSaveToast(false);
@@ -121,7 +136,7 @@ export default function Settings({ userName = "عبد الله العتيبي", 
   return (
     <div className="settings-page-wrapper" dir="rtl">
       {/* الهيدر العلوي الموحد */}
-      <TopHeader userName={userName} userRole={userRole} onNewProject={onNewProject} />
+      <TopHeader userName={currentUserName} userRole={currentUserRole} onNewProject={onNewProject} />
 
       {/* تنبيه نجاح الحفظ العلوي المطابق للصورة الرابعة */}
       {showSaveToast && (

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import logoImage from '../images/Aaa.png';
 import './Header.css';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header({ 
   activePage = 'home', 
@@ -10,6 +11,7 @@ export default function Header({
   onRegister 
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, isAuthenticated } = useAuth();
 
   const current = activePage || page || 'home';
 
@@ -46,14 +48,22 @@ export default function Header({
 
   const handleLoginClick = () => {
     setMobileOpen(false);
-    if (onLogin) onLogin();
-    else if (onNavigate) onNavigate('login');
+    if (isAuthenticated) {
+      if (onNavigate) onNavigate('dashboard');
+    } else {
+      if (onLogin) onLogin();
+      else if (onNavigate) onNavigate('login');
+    }
   };
 
   const handleRegisterClick = () => {
     setMobileOpen(false);
-    if (onRegister) onRegister();
-    else if (onNavigate) onNavigate('register');
+    if (isAuthenticated) {
+      if (onNavigate) onNavigate('dashboard');
+    } else {
+      if (onRegister) onRegister();
+      else if (onNavigate) onNavigate('register');
+    }
   };
 
   return (
@@ -117,28 +127,55 @@ export default function Header({
             onClick={() => handleNav('escrow')}
           >
             حماية المدفوعات والضمان
- 
           </button>
 
           {/* أزرار الموبايل داخل القائمة المنسدلة */}
           <div className="unified-header__mobile-actions">
-            <button type="button" className="unified-header__btn-login" onClick={handleLoginClick}>
-              تسجيل الدخول
-            </button>
-            <button type="button" className="unified-header__btn-start" onClick={handleRegisterClick}>
-              ابدأ مشروعك
-            </button>
+            {isAuthenticated ? (
+              <button 
+                type="button" 
+                className="unified-header__btn-start" 
+                onClick={() => handleNav('dashboard')}
+              >
+                لوحة التحكم ({user?.full_name?.split(' ')[0] || 'حسابي'})
+              </button>
+            ) : (
+              <>
+                <button type="button" className="unified-header__btn-login" onClick={handleLoginClick}>
+                  تسجيل الدخول
+                </button>
+                <button type="button" className="unified-header__btn-start" onClick={handleRegisterClick}>
+                  ابدأ مشروعك
+                </button>
+              </>
+            )}
           </div>
         </nav>
 
         {/* أزرار العمليات على اليسار */}
         <div className="unified-header__actions">
-          <button type="button" className="unified-header__btn-login" onClick={handleLoginClick}>
-            تسجيل الدخول
-          </button>
-          <button type="button" className="unified-header__btn-start" onClick={handleRegisterClick}>
-            ابدأ مشروعك
-          </button>
+          {isAuthenticated ? (
+            <button 
+              type="button" 
+              className="unified-header__btn-start" 
+              onClick={() => handleNav('dashboard')}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+            >
+              <span>لوحة التحكم</span>
+              <small style={{ opacity: 0.85, fontWeight: 'normal' }}>
+                ({user?.full_name?.split(' ')[0] || 'حسابي'})
+              </small>
+            </button>
+          ) : (
+            <>
+              <button type="button" className="unified-header__btn-login" onClick={handleLoginClick}>
+                تسجيل الدخول
+              </button>
+              <button type="button" className="unified-header__btn-start" onClick={handleRegisterClick}>
+                ابدأ مشروعك
+              </button>
+            </>
+          )}
         </div>
 
         {/* زر القائمة للشاشات الصغيرة */}

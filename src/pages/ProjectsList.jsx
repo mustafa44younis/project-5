@@ -1,6 +1,7 @@
-﻿import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
 import ProjectDetails from './ProjectDetails';
+import { projectsService } from '../services/projects.service';
 import './ProjectsList.css';
 import emptyProjectsImg from '../images/empty-projects.png';
 
@@ -23,8 +24,36 @@ export default function ProjectsList({ onNavigate }) {
   const [filter, setFilter] = useState('الكل');
   const [search, setSearch] = useState('');
   const [selectedProjectForDetails, setSelectedProjectForDetails] = useState(null);
+  const [liveProjects, setLiveProjects] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const projects = [
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoading(true);
+    const statusMap = {
+      'الكل': 'all',
+      'قيد التنفيذ': 'in_progress',
+      'بانتظار المراجعة': 'under_review',
+      'المكتملة': 'completed'
+    };
+    const statusParam = statusMap[filter] || 'all';
+    projectsService.getProjects(statusParam)
+      .then((res) => {
+        if (isMounted && res?.data) {
+          setLiveProjects(res.data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Projects live fetch failed:', err.message);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, [filter]);
+
+  const defaultProjects = [
     {
       id: 1,
       title: 'متجر سلة الخير',
@@ -77,6 +106,37 @@ export default function ProjectsList({ onNavigate }) {
       icon: <SmartphoneRoundedIcon sx={{ fontSize: 24, color: '#14A800' }} />
     }
   ];
+
+  const rawList = Array.isArray(liveProjects) 
+    ? liveProjects 
+    : (liveProjects?.projects || []);
+
+  const counts = liveProjects?.counts || {
+    all: rawList.length || 3,
+    in_progress: rawList.filter(p => p.status === 'in_progress').length || 2,
+    under_review: rawList.filter(p => p.status === 'under_review').length || 1,
+    completed: rawList.filter(p => p.status === 'completed').length || 0,
+  };
+
+  const projects = rawList.length > 0
+    ? rawList.map((p, idx) => ({
+        id: p.id,
+        title: p.title,
+        fullTitle: `${p.title} - ${p.current_phase_name || p.category || 'مشروع تقني'}`,
+        subtitle: p.category || 'تطوير وتصميم',
+        code: `AC-${String(p.id).padStart(3, '0')}`,
+        leader: `قائد المشروع: ${p.team_leader?.full_name || 'قائد الفريق'}`,
+        leaderImg: p.team_leader?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
+        leaderRole: p.team_leader?.job_title || p.team_leader?.role || 'قائد الفريق',
+        status: p.status === 'under_review' ? 'بانتظار المراجعة' : (p.status === 'completed' ? 'مكتمل' : 'قيد التنفيذ'),
+        statusClass: p.status === 'under_review' ? 'pending' : (p.status === 'completed' ? 'completed' : 'in-progress'),
+        progress: Number(p.progress) || 0,
+        nextAction: `المرحلة الحالية: ${p.current_phase_name || 'قيد التطوير'}`,
+        budget: p.budget ? `${Number(p.budget).toLocaleString()} ر.س` : 'الميزانية غير محدودة',
+        date: p.deadline_formatted || p.deadline || 'قريباً',
+        icon: idx % 3 === 0 ? <ShoppingCartRoundedIcon sx={{ fontSize: 24, color: '#14A800' }} /> : (idx % 3 === 1 ? <SpaRoundedIcon sx={{ fontSize: 24, color: '#14A800' }} /> : <SmartphoneRoundedIcon sx={{ fontSize: 24, color: '#14A800' }} />)
+      }))
+    : defaultProjects;
 
   // دالة فتح صفحة تفاصيل المشروع مباشرة
   const handleOpenProjectDetails = (project) => {
@@ -174,15 +234,15 @@ export default function ProjectsList({ onNavigate }) {
         </div>
         <div className="summary-stats-boxes">
           <div className="stat-box">
-            <span className="num gray">2</span>
+            <span className="num gray">{counts.completed ?? 0}</span>
             <span className="lbl">مشاريع مكتملة</span>
           </div>
           <div className="stat-box">
-            <span className="num orange">1</span>
+            <span className="num orange">{counts.under_review ?? 1}</span>
             <span className="lbl">بانتظار المراجعة</span>
           </div>
           <div className="stat-box">
-            <span className="num green">3</span>
+            <span className="num green">{counts.in_progress ?? 2}</span>
             <span className="lbl">قيد التنفيذ</span>
           </div>
         </div>
@@ -191,10 +251,10 @@ export default function ProjectsList({ onNavigate }) {
       {/* 4. شريط الفلترة والبحث */}
       <div className="proj-filter-bar">
         <div className="filter-tabs">
-          <button className={filter === 'الكل' ? 'active' : ''} onClick={() => setFilter('الكل')}>الكل (5)</button>
-          <button className={filter === 'قيد التنفيذ' ? 'active' : ''} onClick={() => setFilter('قيد التنفيذ')}>قيد التنفيذ (3)</button>
-          <button className={filter === 'بانتظار المراجعة' ? 'active' : ''} onClick={() => setFilter('بانتظار المراجعة')}>بانتظار المراجعة (1)</button>
-          <button className={filter === 'المكتملة' ? 'active' : ''} onClick={() => setFilter('المكتملة')}>المكتملة (2)</button>
+          <button className={filter === 'الكل' ? 'active' : ''} onClick={() => setFilter('الكل')}>الكل ({counts.all ?? 3})</button>
+          <button className={filter === 'قيد التنفيذ' ? 'active' : ''} onClick={() => setFilter('قيد التنفيذ')}>قيد التنفيذ ({counts.in_progress ?? 2})</button>
+          <button className={filter === 'بانتظار المراجعة' ? 'active' : ''} onClick={() => setFilter('بانتظار المراجعة')}>بانتظار المراجعة ({counts.under_review ?? 1})</button>
+          <button className={filter === 'المكتملة' ? 'active' : ''} onClick={() => setFilter('المكتملة')}>المكتملة ({counts.completed ?? 0})</button>
         </div>
         <div className="search-input-box">
           <SearchRoundedIcon sx={{ color: '#667085', fontSize: 20 }} />

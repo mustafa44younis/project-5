@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
+import { dashboardService } from '../services/dashboard.service';
 import './Overview.css';
 
 // MUI Icons
@@ -18,7 +19,37 @@ import RocketLaunchRoundedIcon from '@mui/icons-material/RocketLaunchRounded';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 
 export default function Overview({ onNavigate }) {
-  const activeProjects = [
+  const [overviewData, setOverviewData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    dashboardService.getOverview()
+      .then((res) => {
+        if (isMounted && res?.data) {
+          setOverviewData(res.data);
+        }
+      })
+      .catch((err) => {
+        // في حال عدم توفر اتصال بالإنترنت يستمر العرض الافتراضي بسلاسة
+        console.warn('Dashboard overview live fetch failed:', err.message);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => { isMounted = false; };
+  }, []);
+
+  // الإحصائيات (الحية من السيرفر أو الافتراضية)
+  const stats = overviewData?.stats || {
+    active_projects: 3,
+    completed_projects: 2,
+    total_spent: 41500,
+    wallet_balance: 12500,
+  };
+
+  const defaultProjects = [
     {
       id: 1,
       name: 'متجر سلة الخير',
@@ -60,12 +91,92 @@ export default function Overview({ onNavigate }) {
     }
   ];
 
+  const defaultTeam = [
+    {
+      id: 1,
+      full_name: 'أحمد السالم',
+      job_title: 'قائد التطوير • سلة الخير',
+      avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'
+    },
+    {
+      id: 2,
+      full_name: 'سارة القحطاني',
+      job_title: 'قائدة التصميم • نواة',
+      avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100'
+    },
+    {
+      id: 3,
+      full_name: 'خالد الحربي',
+      job_title: 'قائد المنتج • موعد',
+      avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100'
+    },
+    {
+      id: 4,
+      full_name: 'نورة الدوسري',
+      job_title: 'مطورة واجهات • سلة الخير',
+      avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100'
+    }
+  ];
+
+  const activeTeam = (overviewData?.team && overviewData.team.length > 0)
+    ? overviewData.team
+    : defaultTeam;
+
+  const defaultEvents = [
+    { id: 1, day: '18', month: 'أكتوبر', title: 'اعتماد دليل هوية نواة', sub: 'سارة القحطاني • 12:00 م', isGreen: false },
+    { id: 2, day: '22', month: 'أكتوبر', title: 'تسليم واجهات سلة الخير', sub: 'أحمد السالم • 03:00 م', isGreen: true },
+    { id: 3, day: '25', month: 'أكتوبر', title: 'مراجعة تجربة تطبيق موعد', sub: 'خالد الحربي • 11:00 ص', isGreen: true }
+  ];
+
+  const upcomingEvents = (overviewData?.upcoming_events && overviewData.upcoming_events.length > 0)
+    ? overviewData.upcoming_events.map((ev, idx) => ({
+        id: ev.id || idx,
+        day: ev.event_day || '18',
+        month: ev.event_month || 'أكتوبر',
+        title: ev.title,
+        sub: `${ev.assigned_to || 'فريق العمل'} • ${ev.event_time || '12:00 م'}`,
+        isGreen: idx > 0
+      }))
+    : defaultEvents;
+
+  const defaultActivities = [
+    { id: 1, title: 'دليل هوية نواة جاهز للمراجعة', desc: 'أرسلت سارة القحطاني النسخة النهائية', time: 'منذ 30 دقيقة', isGreen: true },
+    { id: 2, title: 'تقدم جديد في متجر سلة الخير', desc: 'حدّث أحمد السالم نسبة الإنجاز إلى 65%', time: 'منذ ساعتين', isGreen: false },
+    { id: 3, title: 'تمت إضافة رصيد إلى محفظتك', desc: 'إيداع بقيمة 5,000 ر.س بنجاح', time: 'أمس 04:30 م', isGreen: true },
+    { id: 4, title: 'بدء تصميم تجربة تطبيق موعد', desc: 'بدأ خالد الحربي العمل على المرحلة الثانية', time: 'أمس 10:00 ص', isGreen: false }
+  ];
+
+  const recentActivities = (overviewData?.recent_activities && overviewData.recent_activities.length > 0)
+    ? overviewData.recent_activities.map((act, idx) => ({
+        id: act.id || idx,
+        title: act.title,
+        desc: act.description || 'نشاط جديد في المشروع',
+        time: act.time || 'اليوم',
+        isGreen: idx % 2 === 0
+      }))
+    : defaultActivities;
+
+  const rawActiveProjects = overviewData?.active_projects || overviewData?.activeProjects || [];
+  const activeProjects = rawActiveProjects.length > 0
+    ? rawActiveProjects.map((p, idx) => ({
+        id: p.id,
+        name: p.title || p.name,
+        desc: p.category || p.desc || 'مشروع تقني',
+        leader: p.team_leader?.full_name || 'قائد الفريق',
+        leaderImg: p.team_leader?.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
+        progress: Number(p.progress) || 0,
+        status: p.status === 'under_review' ? 'بانتظار المراجعة' : (p.status === 'completed' ? 'مكتمل' : 'قيد التنفيذ'),
+        statusClass: p.status === 'under_review' ? 'pending' : (p.status === 'completed' ? 'completed' : 'in-progress'),
+        subStatus: p.current_phase_name || 'المرحلة الحالية',
+        date: p.deadline_formatted || p.deadline || 'قريباً',
+        icon: idx % 3 === 0 ? <ShoppingCartRoundedIcon sx={{ fontSize: 18, color: '#14A800' }} /> : (idx % 3 === 1 ? <SpaRoundedIcon sx={{ fontSize: 18, color: '#14A800' }} /> : <SmartphoneRoundedIcon sx={{ fontSize: 18, color: '#14A800' }} />)
+      }))
+    : defaultProjects;
+
   return (
     <div className="dashboard-overview-page" dir="rtl">
       {/* 1. الهيدر العلوي */}
       <TopHeader 
-        userName="عبد الله العتيبي" 
-        userRole="حساب عميل" 
         onNewProject={() => onNavigate && onNavigate('new-project')} 
       />
 
@@ -88,7 +199,7 @@ export default function Overview({ onNavigate }) {
           </div>
           <div className="sc-info">
             <span className="lbl">المشاريع النشطة</span>
-            <div className="num">3</div>
+            <div className="num">{stats.active_projects}</div>
             <small>مشاريعك تقدم نحو الإنجاز</small>
           </div>
         </div>
@@ -99,7 +210,7 @@ export default function Overview({ onNavigate }) {
           </div>
           <div className="sc-info">
             <span className="lbl">المشاريع المكتملة</span>
-            <div className="num">2</div>
+            <div className="num">{stats.completed_projects}</div>
             <small>من الفكرة إلى التسليم بنجاح</small>
           </div>
         </div>
@@ -110,7 +221,7 @@ export default function Overview({ onNavigate }) {
           </div>
           <div className="sc-info">
             <span className="lbl">إجمالي الإنفاق</span>
-            <div className="num">41,500 <small>ر.س</small></div>
+            <div className="num">{Number(stats.total_spent).toLocaleString()} <small>ر.س</small></div>
             <small>على جميع مشاريعك حتى اليوم</small>
           </div>
         </div>
@@ -121,7 +232,7 @@ export default function Overview({ onNavigate }) {
           </div>
           <div className="sc-info">
             <span className="lbl">رصيد المحفظة</span>
-            <div className="num green">12,500 <small>ر.س</small></div>
+            <div className="num green">{Number(stats.wallet_balance).toLocaleString()} <small>ر.س</small></div>
             <small>رصيد متاح لتمويل مشاريعك</small>
           </div>
         </div>
@@ -132,7 +243,7 @@ export default function Overview({ onNavigate }) {
         <div className="sec-header-flex">
           <div className="sec-title-badge">
             <h2>المشاريع النشطة</h2>
-            <span className="badge-count">3</span>
+            <span className="badge-count">{activeProjects.length}</span>
           </div>
           <button className="btn-link-green" onClick={() => onNavigate('projects')}>
             عرض جميع المشاريع ←
@@ -243,29 +354,17 @@ export default function Overview({ onNavigate }) {
           </div>
 
           <div className="upcoming-events-list">
-            <div className="event-item">
-              <div className="ev-date-badge">18 <small>أكتوبر</small></div>
-              <div className="ev-info">
-                <strong>اعتماد دليل هوية نواة</strong>
-                <small>سارة القحطاني • 12:00 م</small>
+            {upcomingEvents.map((ev) => (
+              <div className="event-item" key={ev.id}>
+                <div className={`ev-date-badge ${ev.isGreen ? 'green' : ''}`}>
+                  {ev.day} <small>{ev.month}</small>
+                </div>
+                <div className="ev-info">
+                  <strong>{ev.title}</strong>
+                  <small>{ev.sub}</small>
+                </div>
               </div>
-            </div>
-
-            <div className="event-item">
-              <div className="ev-date-badge green">22 <small>أكتوبر</small></div>
-              <div className="ev-info">
-                <strong>تسليم واجهات سلة الخير</strong>
-                <small>أحمد السالم • 03:00 م</small>
-              </div>
-            </div>
-
-            <div className="event-item">
-              <div className="ev-date-badge green">25 <small>أكتوبر</small></div>
-              <div className="ev-info">
-                <strong>مراجعة تجربة تطبيق موعد</strong>
-                <small>خالد الحربي • 11:00 ص</small>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -273,71 +372,28 @@ export default function Overview({ onNavigate }) {
         <div className="dash-sub-card">
           <div className="sec-header-flex">
             <h3>فريقك النشط</h3>
-            <span className="sub-cnt">4 أعضاء</span>
+            <span className="sub-cnt">{activeTeam.length} أعضاء</span>
           </div>
 
-          <div className="active-status-line">● 3 أعضاء متصلون الآن</div>
+          <div className="active-status-line">● {Math.min(activeTeam.length, 3)} أعضاء متصلون الآن</div>
 
           <div className="team-members-list-col">
-            <div className="tm-col-item">
-              <img 
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100" 
-                alt="أحمد" 
-                className="team-member-avatar" 
-              />
-              <div className="tm-meta">
-                <strong>أحمد السالم</strong>
-                <small>قائد التطوير • سلة الخير</small>
+            {activeTeam.map((m) => (
+              <div className="tm-col-item" key={m.id}>
+                <img 
+                  src={m.avatar_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'} 
+                  alt={m.full_name} 
+                  className="team-member-avatar" 
+                />
+                <div className="tm-meta">
+                  <strong>{m.full_name}</strong>
+                  <small>{m.job_title || 'عضو بالفريق'}</small>
+                </div>
+                <button className="btn-chat-icon" onClick={() => onNavigate('messages', { teamMember: m })} title="مراسلة">
+                  <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
+                </button>
               </div>
-              <button className="btn-chat-icon" onClick={() => onNavigate('messages')} title="مراسلة">
-                <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
-              </button>
-            </div>
-
-            <div className="tm-col-item">
-              <img 
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" 
-                alt="سارة" 
-                className="team-member-avatar" 
-              />
-              <div className="tm-meta">
-                <strong>سارة القحطاني</strong>
-                <small>قائدة التصميم • نواة</small>
-              </div>
-              <button className="btn-chat-icon" onClick={() => onNavigate('messages')} title="مراسلة">
-                <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
-              </button>
-            </div>
-
-            <div className="tm-col-item">
-              <img 
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100" 
-                alt="خالد" 
-                className="team-member-avatar" 
-              />
-              <div className="tm-meta">
-                <strong>خالد الحربي</strong>
-                <small>قائد المنتج • موعد</small>
-              </div>
-              <button className="btn-chat-icon" onClick={() => onNavigate('messages')} title="مراسلة">
-                <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
-              </button>
-            </div>
-
-            <div className="tm-col-item">
-              <img 
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100" 
-                alt="نورة" 
-                className="team-member-avatar" 
-              />
-              <div className="tm-meta">
-                <strong>نورة الدوسري</strong>
-                <small>مطورة واجهات • سلة الخير</small>
-              </div>
-              <button className="btn-chat-icon" onClick={() => onNavigate('messages')} title="مراسلة">
-                <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 16 }} />
-              </button>
-            </div>
+            ))}
           </div>
 
           <div className="team-footer-callout">
@@ -352,53 +408,22 @@ export default function Overview({ onNavigate }) {
         <div className="dash-sub-card">
           <div className="sec-header-flex">
             <h3>آخر النشاطات</h3>
-            <small className="time-sub">آخر يومين</small>
+            <small className="time-sub">آخر التحديثات</small>
           </div>
 
           <div className="activities-timeline">
-            <div className="act-timeline-item">
-              <span className="act-dot green">
-                <FolderRoundedIcon sx={{ fontSize: 14 }} />
-              </span>
-              <div className="act-info">
-                <strong>دليل هوية نواة جاهز للمراجعة</strong>
-                <p>أرسلت سارة القحطاني النسخة النهائية</p>
-                <small>منذ 30 دقيقة</small>
+            {recentActivities.map((act) => (
+              <div className="act-timeline-item" key={act.id}>
+                <span className={`act-dot ${act.isGreen ? 'green' : ''}`}>
+                  {act.isGreen ? <FolderRoundedIcon sx={{ fontSize: 14 }} /> : <TrendingUpRoundedIcon sx={{ fontSize: 14 }} />}
+                </span>
+                <div className="act-info">
+                  <strong>{act.title}</strong>
+                  <p>{act.desc}</p>
+                  <small>{act.time}</small>
+                </div>
               </div>
-            </div>
-
-            <div className="act-timeline-item">
-              <span className="act-dot">
-                <TrendingUpRoundedIcon sx={{ fontSize: 14 }} />
-              </span>
-              <div className="act-info">
-                <strong>تقدم جديد في متجر سلة الخير</strong>
-                <p>حدّث أحمد السالم نسبة الإنجاز إلى 65%</p>
-                <small>منذ ساعتين</small>
-              </div>
-            </div>
-
-            <div className="act-timeline-item">
-              <span className="act-dot green">
-                <CreditCardRoundedIcon sx={{ fontSize: 14 }} />
-              </span>
-              <div className="act-info">
-                <strong>تمت إضافة رصيد إلى محفظتك</strong>
-                <p>إيداع بقيمة 5,000 ر.س بنجاح</p>
-                <small>أمس 04:30 م</small>
-              </div>
-            </div>
-
-            <div className="act-timeline-item">
-              <span className="act-dot">
-                <RocketLaunchRoundedIcon sx={{ fontSize: 14 }} />
-              </span>
-              <div className="act-info">
-                <strong>بدء تصميم تجربة تطبيق موعد</strong>
-                <p>بدأ خالد الحربي العمل على المرحلة الثانية</p>
-                <small>أمس 10:00 ص</small>
-              </div>
-            </div>
+            ))}
           </div>
 
           <button className="btn-view-all-act" onClick={() => alert('عرض جميع النشاطات')}>

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import SmartConsultation from '../pages/SmartConsultation';
 import SmartConversation from '../pages/SmartConversation';
 import Overview from '../pages/Overview';
@@ -25,6 +25,7 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HeadsetMicRoundedIcon from '@mui/icons-material/HeadsetMicRounded';
 import ChevronLeftRoundedIcon from '@mui/icons-material/ChevronLeftRounded';
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import { useAuth } from '../context/AuthContext';
 
 export default function ClientLayout({
   initialTab = 'dashboard',
@@ -32,6 +33,7 @@ export default function ClientLayout({
   onLogout,
   onNavigate
 }) {
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [consultationSubView, setConsultationSubView] = useState(subView || 'consultation');
   const [consultationData, setConsultationData] = useState(null);
@@ -83,6 +85,9 @@ export default function ClientLayout({
         setWalletModal(null);
       }
     } else if (target === 'home' || target === 'logout') {
+      if (target === 'logout') {
+        logout();
+      }
       if (onLogout) onLogout();
       else if (onNavigate) onNavigate('home');
       return;

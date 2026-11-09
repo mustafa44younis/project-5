@@ -1,6 +1,10 @@
-// تصدير جميع الـ services من مكان واحد
-export { authService } from './auth.service';
-export { projectsService } from './projects.service';
-export { messagesService } from './messages.service';
-export { walletService } from './wallet.service';
-export { aiService } from './ai.service';
+export { default as api } from './api';
+export { default as authService } from './auth.service';
+export { default as projectsService } from './projects.service';
+export { default as dashboardService } from './dashboard.service';
+export { default as messagesService } from './messages.service';
+export { default as walletService } from './wallet.service';
+export { default as aiService } from './ai.service';
+export { default as profileService } from './profile.service';
+export { default as notificationsService } from './notifications.service';
+export { default as uploadService } from './upload.service';

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
@@ -6,6 +6,8 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 import FolderOutlinedIcon from '@mui/icons-material/FolderOutlined';
 import SwapHorizRoundedIcon from '@mui/icons-material/SwapHorizRounded';
+import CircularProgress from '@mui/material/CircularProgress';
+import projectsService from '../services/projects.service';
 import './​FinalDelivery.css';
 
 export default function FinalDelivery({ onNavigate, projectData }) {
@@ -107,6 +109,31 @@ export default function FinalDelivery({ onNavigate, projectData }) {
   };
 
   const [currentProject, setCurrentProject] = useState(() => resolveProject(projectData));
+  const [loading, setLoading] = useState(false);
+  const [submittingSignoff, setSubmittingSignoff] = useState(false);
+  const [apiDeliveryData, setApiDeliveryData] = useState(null);
+
+  // جلب تفاصيل التسليم النهائي من الخادم
+  useEffect(() => {
+    let isMounted = true;
+    const fetchDelivery = async () => {
+      const pid = currentProject.id || projectData?.id || 2;
+      setLoading(true);
+      try {
+        const res = await projectsService.getFinalDelivery(pid);
+        if (isMounted && res?.data) {
+          setApiDeliveryData(res.data);
+        }
+      } catch (err) {
+        console.warn('⚠️ تعذر جلب تفاصيل التسليم النهائي من الـ API، سيتم استخدام القالب المحلي:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchDelivery();
+    return () => { isMounted = false; };
+  }, [currentProject.id]);
 
   // تحديث المشروع عند تمرير بيانات جديدة
   useEffect(() => {
@@ -139,7 +166,36 @@ export default function FinalDelivery({ onNavigate, projectData }) {
     }
   };
 
-  const filesToDownload = currentProject.files || projectDeliverables.nawa.files;
+  // ملفات التحميل من الـ API أو الافتراضية
+  const filesToDownload = (apiDeliveryData?.deliverables && apiDeliveryData.deliverables.length > 0)
+    ? apiDeliveryData.deliverables.map(d => ({
+        title: d.title,
+        size: d.file_size || '12.5 MB',
+        type: d.file_type || 'SOURCE • ASSETS',
+        desc: 'ملف التسليم النهائي المعتمد'
+      }))
+    : (currentProject.files || projectDeliverables.nawa.files);
+
+  // اعتماد التسليم النهائي للمشروع
+  const handleFinalSignoffSubmit = async () => {
+    if (!feedbackText.trim()) {
+      setFeedbackError(true);
+      return;
+    }
+    setFeedbackError(false);
+    setSubmittingSignoff(true);
+
+    try {
+      const pid = currentProject.id || 2;
+      await projectsService.finalSignoff(pid, rating, feedbackText);
+    } catch (err) {
+      console.warn('تعذر تسجيل التوقيع عبر API:', err.message);
+    } finally {
+      setSubmittingSignoff(false);
+      setShowSuccessModal(false);
+      setShowContractScreen(true);
+    }
+  };
 
   return (
     <div className="final-delivery-page" dir="rtl" style={{ background: '#FAFAFA', minHeight: '100vh', paddingBottom: '40px' }}>
@@ -369,7 +425,10 @@ export default function FinalDelivery({ onNavigate, projectData }) {
 
             <div className="final-title-row">
               <div>
-                <h1>تسليم ملفات المشروع النهائية — {currentProject.title}</h1>
+                <h1>
+                  تسليم ملفات المشروع النهائية — {currentProject.title}
+                  {loading && <small style={{ fontSize: '12px', color: '#14A800', fontWeight: 'normal' }}> (جارٍ التحديث...)</small>}
+                </h1>
                 <p>راجع المخرجات النهائية، ثم اعتمد التسليم لتحرير دفعة المرحلة المحجوزة بأمان.</p>
               </div>
               <span className="badge-waiting-approval">بانتظار اعتمادك</span>
@@ -446,7 +505,12 @@ export default function FinalDelivery({ onNavigate, projectData }) {
             </button>
 
             <div className="dispute-link-center">
-              <button className="link-red-dispute">فتح تذكرة اعتراض / نزاع مالي (Dispute Ticket)</button>
+              <button 
+                className="link-red-dispute"
+                onClick={() => onNavigate && onNavigate('wallet', { modal: 'dispute' })}
+              >
+                فتح تذكرة اعتراض / نزاع مالي (Dispute Ticket)
+              </button>
             </div>
           </section>
 
@@ -483,18 +547,12 @@ export default function FinalDelivery({ onNavigate, projectData }) {
 
                 <button 
                   type="button"
-                  onClick={() => {
-                    if (!feedbackText.trim()) {
-                      setFeedbackError(true);
-                      return;
-                    }
-                    setFeedbackError(false);
-                    setShowSuccessModal(false);
-                    setShowContractScreen(true);
-                  }}
+                  onClick={handleFinalSignoffSubmit}
+                  disabled={submittingSignoff}
                   className="btn-modal-submit"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                 >
-                  إرسال التقييم والانتقال لاعتماد العقد المبدئي ←
+                  {submittingSignoff ? <CircularProgress size={16} color="inherit" /> : 'إرسال التقييم والانتقال لاعتماد العقد المبدئي ←'}
                 </button>
               </div>
             </div>

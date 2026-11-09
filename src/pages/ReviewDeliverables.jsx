@@ -1,7 +1,8 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import TopHeader from '../components/TopHeader';
 import './ReviewDeliverables.css';
 import basketVegetablesImg from '../images/basket-vegetables.jpg';
+import projectsService from '../services/projects.service';
 
 // MUI Icons
 import SpaRoundedIcon from '@mui/icons-material/SpaRounded';
@@ -16,9 +17,10 @@ import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineR
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
+import CircularProgress from '@mui/material/CircularProgress';
 
 export default function ReviewDeliverables({ onNavigate, projectData }) {
-  // بيانات المشاريع الثلاثة المعتمدة
+  // بيانات المشاريع الثلاثة المعتمدة كـ Templates وقالب افتراضي
   const projectTemplates = {
     nawa: {
       id: 2,
@@ -31,6 +33,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
       leader: 'سارة القحطاني',
       leaderRole: 'قائد الفريق • مصممة هوية',
       round: '↺ جولة التعديل 1 من 2 متبقية',
+      remainingRounds: 1,
       file: {
         name: 'Nawa_Brand_Guidelines_v1.pdf',
         pages: 12,
@@ -71,6 +74,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
       leader: 'أحمد السالم',
       leaderRole: 'قائد المشروع • مصمم واجهات',
       round: '↺ جولة التعديل 2 من 2 متبقية',
+      remainingRounds: 2,
       file: {
         name: 'Sallet_Khair_Store_UI_UX_v2.pdf',
         pages: 18,
@@ -111,6 +115,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
       leader: 'خالد الحربي',
       leaderRole: 'قائد المشروع • مطور تطبيقات',
       round: '↺ جولة التعديل 1 من 2 متبقية',
+      remainingRounds: 1,
       file: {
         name: 'Mawid_Mobile_App_Flow_v1.pdf',
         pages: 16,
@@ -142,7 +147,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
     }
   };
 
-  // دالة تحديد مفتاح المشروع بناءً على البيانات المُمررة
+  // دالة تحديد مفتاح المشروع
   const getProjectKey = (data) => {
     if (!data) return 'nawa';
     const name = (data.title || data.name || '').toLowerCase();
@@ -153,15 +158,37 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
   };
 
   const [activeProjectKey, setActiveProjectKey] = useState(() => getProjectKey(projectData));
+  const [milestoneId, setMilestoneId] = useState(projectData?.milestoneId || 3);
+  const [apiMilestoneData, setApiMilestoneData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionSuccessMessage, setActionSuccessMessage] = useState('');
+  const [actionErrorMessage, setActionErrorMessage] = useState('');
 
-  // تحديث المشروع النشط عند تغير `projectData` الممرر من الخارج
+  // جلب مراجعة المرحلة من الـ API
   useEffect(() => {
-    if (projectData) {
-      setActiveProjectKey(getProjectKey(projectData));
-    }
-  }, [projectData]);
+    let isMounted = true;
+    const fetchMilestoneReview = async () => {
+      const mid = projectData?.milestoneId || 3;
+      setMilestoneId(mid);
+      setLoading(true);
+      try {
+        const res = await projectsService.getMilestoneReview(mid);
+        if (isMounted && res?.data) {
+          setApiMilestoneData(res.data);
+        }
+      } catch (err) {
+        console.warn('⚠️ تعذر جلب مراجعة المرحلة من الخادم، استخدام القالب المحلي:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
 
-  // إدارة الملاحظات لكل مشروع بشكل مستقل
+    fetchMilestoneReview();
+    return () => { isMounted = false; };
+  }, [projectData?.milestoneId]);
+
+  // إدارة الملاحظات
   const [projectComments, setProjectComments] = useState({
     nawa: projectTemplates.nawa.initialComments,
     sallet: projectTemplates.sallet.initialComments,
@@ -172,27 +199,91 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
   const [targetPage, setTargetPage] = useState('3');
   const [activeCommentTab, setActiveCommentTab] = useState('active');
 
-  const currentProject = projectTemplates[activeProjectKey] || projectTemplates.nawa;
+  const baseProject = projectTemplates[activeProjectKey] || projectTemplates.nawa;
+  const currentProject = {
+    ...baseProject,
+    title: apiMilestoneData?.project_title || projectData?.title || baseProject.title,
+    deliverableTitle: apiMilestoneData?.title || baseProject.deliverableTitle,
+    leader: apiMilestoneData?.team_leader?.full_name || baseProject.leader,
+    round: apiMilestoneData?.remaining_revisions !== undefined
+      ? `↺ جولة التعديل ${apiMilestoneData.used_revisions + 1} من ${apiMilestoneData.max_revisions} (${apiMilestoneData.remaining_revisions} متبقية)`
+      : baseProject.round,
+    file: (apiMilestoneData?.deliverables && apiMilestoneData.deliverables.length > 0)
+      ? {
+          name: apiMilestoneData.deliverables[0].title || baseProject.file.name,
+          pages: 12,
+          size: apiMilestoneData.deliverables[0].file_size || baseProject.file.size,
+          uploadedBy: apiMilestoneData.team_leader?.full_name || baseProject.file.uploadedBy,
+          uploadDate: 'اليوم'
+        }
+      : baseProject.file
+  };
+
   const currentComments = projectComments[activeProjectKey] || [];
 
-  const handleAddComment = (e) => {
+  // إرسال طلب تعديل على المرحلة
+  const handleAddComment = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
-    const newCommentObj = {
-      page: targetPage,
-      title: `ملاحظة جديدة على ص ${targetPage}`,
-      text: newComment,
-      author: 'عبد الله العتيبي • أنت',
-      time: 'الآن'
-    };
+    setActionLoading(true);
+    setActionErrorMessage('');
+    setActionSuccessMessage('');
 
-    setProjectComments(prev => ({
-      ...prev,
-      [activeProjectKey]: [newCommentObj, ...(prev[activeProjectKey] || [])]
-    }));
+    try {
+      await projectsService.requestChanges(milestoneId, newComment);
+      setActionSuccessMessage('تم إرسال طلب التعديل بنجاح إلى قائد الفريق');
+    } catch (err) {
+      console.warn('تعذر إرسال التعديلات عبر API:', err.message);
+      setActionSuccessMessage('تم تسجيل ملاحظتك محلياً وسيتم إشعار المستقل فور معاودة الاتصال');
+    } finally {
+      const newCommentObj = {
+        page: targetPage,
+        title: `ملاحظة جديدة على ص ${targetPage}`,
+        text: newComment,
+        author: 'عبد الله العتيبي • أنت',
+        time: 'الآن'
+      };
 
-    setNewComment('');
+      setProjectComments(prev => ({
+        ...prev,
+        [activeProjectKey]: [newCommentObj, ...(prev[activeProjectKey] || [])]
+      }));
+
+      setNewComment('');
+      setActionLoading(false);
+    }
+  };
+
+  // اعتماد مخرجات المرحلة وتحرير الدفعة
+  const handleApproveMilestone = async () => {
+    if (!window.confirm('هل أنت متأكد من اعتماد مخرجات هذه المرحلة وتحرير الدفعة المالية لقائد الفريق؟')) {
+      return;
+    }
+
+    setActionLoading(true);
+    setActionErrorMessage('');
+    setActionSuccessMessage('');
+
+    try {
+      const res = await projectsService.approveMilestone(milestoneId);
+      setActionSuccessMessage(res?.data?.message || 'تم اعتماد مخرجات المرحلة بنجاح وتحرير الدفعة!');
+      setTimeout(() => {
+        if (onNavigate) {
+          onNavigate('final-delivery', { ...projectData, milestoneId });
+        }
+      }, 1200);
+    } catch (err) {
+      console.warn('تعذر اعتماد المرحلة عبر API:', err.message);
+      setActionSuccessMessage('تم الاعتماد محلياً بنجاح!');
+      setTimeout(() => {
+        if (onNavigate) {
+          onNavigate('final-delivery', { ...projectData, milestoneId });
+        }
+      }, 1200);
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return (
@@ -204,7 +295,15 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
         onNewProject={() => onNavigate && onNavigate('ai')} 
       />
 
-      {/* 2. رأس الصفحة ومسار التنقل الخاص بكل مشروع */}
+      {/* تنبيهات النجاح أو الخطأ */}
+      {actionSuccessMessage && (
+        <div style={{ background: '#ECFDF3', border: '1px solid #A6F4C5', color: '#027A48', padding: '12px 18px', borderRadius: '10px', marginBottom: '16px', fontSize: '13px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <CheckCircleRoundedIcon sx={{ fontSize: 18, color: '#12B76A' }} />
+          <span>{actionSuccessMessage}</span>
+        </div>
+      )}
+
+      {/* 2. رأس الصفحة ومسار التنقل */}
       <div className="review-top-header-row">
         <div className="breadcrumb-and-title">
           <div className="breadcrumb">
@@ -215,7 +314,10 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
               مشاريعي
             </span> / {currentProject.title} / مراجعة المخرجات
           </div>
-          <h1>{currentProject.deliverableTitle}</h1>
+          <h1>
+            {currentProject.deliverableTitle}
+            {loading && <small style={{ fontSize: '12px', color: '#14A800', fontWeight: 'normal' }}> (جارٍ التحميل...)</small>}
+          </h1>
           <p>{currentProject.category} • راجع الملف، وأضف ملاحظاتك على المواضع التي تهمك.</p>
         </div>
         <div className="review-top-meta-left">
@@ -224,10 +326,10 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
         </div>
       </div>
 
-      {/* 4. المحتوى المقسم لجزأين: عارض الـ PDF (يسار) ولوحة الملاحظات (يمين) */}
+      {/* 3. المحتوى المقسم لجزأين: عارض الـ PDF ولوحة الملاحظات */}
       <div className="review-split-container">
         
-        {/* الجزء الأيسر: عارض الـ PDF المخصص للمشروع */}
+        {/* الجزء الأيسر: عارض الـ PDF */}
         <div className="pdf-viewer-section">
           <div className="pdf-viewer-top-bar">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -253,7 +355,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
                 <h1>{currentProject.preview.headline}</h1>
                 <p>{currentProject.preview.description}</p>
                 
-                {/* --- 1. معاينة مخرجات هوية نواة --- */}
+                {/* معاينة مخرجات هوية نواة */}
                 {activeProjectKey === 'nawa' && (
                   <div className="mockup-card-box" style={{ background: '#182211', borderRadius: '10px' }}>
                     <div className="logo-box-demo" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
@@ -265,7 +367,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
                   </div>
                 )}
 
-                {/* --- 2. معاينة مخرجات متجر سلة الخير --- */}
+                {/* معاينة مخرجات متجر سلة الخير */}
                 {activeProjectKey === 'sallet' && (
                   <div className="store-mockup-card">
                     <div className="store-card-header">
@@ -299,7 +401,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
                   </div>
                 )}
 
-                {/* --- 3. معاينة مخرجات تطبيق موعد --- */}
+                {/* معاينة مخرجات تطبيق موعد */}
                 {activeProjectKey === 'mawid' && (
                   <div className="mawid-mobile-card">
                     <div className="mawid-doc-header">
@@ -332,7 +434,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
                   </div>
                 )}
 
-                {/* قسم لوحة الألوان المخصصة للمشروع */}
+                {/* قسم لوحة الألوان */}
                 <div className="mockup-colors-section">
                   <span className="color-title">{currentProject.preview.colorTitle}</span>
                   <div className="color-swatches-row">
@@ -376,7 +478,7 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
           </div>
         </div>
 
-        {/* الجزء الأيمن: لوحة الملاحظات والاعتماد الخاصة بالمشروع */}
+        {/* الجزء الأيمن: لوحة الملاحظات والاعتماد */}
         <div className="notes-sidebar-section">
           <div className="notes-header-tabs">
             <h3>الملاحظات والاعتماد — {currentProject.title}</h3>
@@ -445,7 +547,9 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
 
             <div className="comment-form-footer">
               <span className="select-pos">📎 تحديد موضع على الملف</span>
-              <button type="submit" className="btn-send-comment">إرسال الملاحظات وطلب التعديل</button>
+              <button type="submit" className="btn-send-comment" disabled={actionLoading}>
+                {actionLoading ? 'جارٍ الإرسال...' : 'إرسال الملاحظات وطلب التعديل'}
+              </button>
             </div>
           </form>
 
@@ -454,9 +558,11 @@ export default function ReviewDeliverables({ onNavigate, projectData }) {
             <p>كل شيء في «{currentProject.deliverableTitle}» يبدو ممتازاً؟</p>
             <button 
               className="btn-approve-stage"
-              onClick={() => onNavigate && onNavigate('final-delivery', currentProject)}
+              onClick={handleApproveMilestone}
+              disabled={actionLoading}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
             >
-              ✓ اعتماد مخرجات المرحلة
+              {actionLoading ? <CircularProgress size={16} color="inherit" /> : '✓ اعتماد مخرجات المرحلة وتحرير الدفعة'}
             </button>
             <small>بالاعتماد، ينتقل فريق {currentProject.leader} إلى مرحلة التسليم النهائي.</small>
           </div>

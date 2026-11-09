@@ -2,7 +2,8 @@
 
 .messages-page-wrapper {
   padding: 20px 24px;
-  background-color: #F8F9FA;
+  background-color: #FAFAFA !important;
+  background: #FAFAFA !important;
   min-height: 100vh;
   font-family: 'Tajawal', sans-serif !important;
   direction: rtl;
@@ -1346,4 +1347,11 @@
   font-size: 11.5px;
   color: #B45309;
   font-weight: 700;
+}
+
+/* ============================================================ */
+/* Spinner للرفع                                                */
+/* ============================================================ */
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
